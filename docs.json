@@ -138,7 +138,6 @@
         "dropdown": "Wallet API",
         "description": "Custody, buy, sell, earn, and loans",
         "icon": "wallet",
-        "href": "/",
         "tabs": [
           {
             "tab": "Guides",
@@ -199,7 +198,6 @@
         "dropdown": "Pro Trading",
         "description": "Spot REST and WebSocket trading",
         "icon": "chart-line",
-        "href": "/pro/overview",
         "tabs": [
           {
             "tab": "Guides",
@@ -242,10 +240,6 @@
                 ]
               },
               {
-                "group": "Spot channels",
-                "asyncapi": "asyncapi/trading.yaml"
-              },
-              {
                 "group": "Futures",
                 "pages": [
                   "pro/websocket-futures"
@@ -259,7 +253,6 @@
         "dropdown": "Partner",
         "description": "B2B2C onboarding, funding, and withdrawals",
         "icon": "building",
-        "href": "/partner/overview",
         "tabs": [
           {
             "tab": "Guides",
@@ -324,7 +317,6 @@
         "dropdown": "AI",
         "description": "MCP server, recipes, and agent files",
         "icon": "robot",
-        "href": "/ai/overview",
         "tabs": [
           {
             "tab": "MCP",
