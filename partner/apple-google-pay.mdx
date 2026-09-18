@@ -1,12 +1,12 @@
 ---
 title: "Apple Pay and Google Pay"
-description: "Wallet-pay funding via Teller proforma and Paylands checkout."
+description: "Wallet-pay funding via Teller proforma, execute, and Paylands checkout."
 ---
 
-Your backend calls Bit2Me. Bit2Me returns a **Paylands** checkout URL. You do not talk to Apple or Google SDKs for this rail.
+Your backend calls Bit2Me. Bit2Me returns a **Paylands** checkout URL after **execute**. You do not talk to Apple or Google SDKs for this rail.
 
 <Info>
-Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com).
+Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com/en/support/tickets/new).
 </Info>
 
 ```mermaid
@@ -19,7 +19,9 @@ sequenceDiagram
   User->>App: Top-up amount + method
   App->>API: Start deposit
   API->>B2M: POST /v1/teller/order/proforma
-  B2M-->>API: 200 orderId, waiting-user, provider.uri
+  B2M-->>API: 200 orderId (CreateOrderData)
+  API->>B2M: POST /v1/teller/order
+  B2M-->>API: 200 waiting-user, provider.uri
   API-->>App: Payment URL
   App->>User: Open checkout
   User->>PL: Complete payment
@@ -32,22 +34,36 @@ sequenceDiagram
 POST /v1/teller/order/proforma
 ```
 
-| Method | Use |
+| `method.type` | Use |
 | --- | --- |
-| `creditCard` | Card deposit |
+| `creditcard` | Card deposit |
 | `google-pay` | Google Pay |
 | `apple-pay` | Apple Pay |
-| `hub-latam` | LATAM rails (for example PIX) |
+| `hub-latam` | LATAM rails |
 
-On HTTP 200 you typically receive `data.orderId`, `data.status` (`waiting-user`), `data.token`, and `data.provider.requestConfiguration.uri`. Open that URI for the user.
+Example body fragment: `"method": { "type": "apple-pay" }`.
 
-HTTP 200 means the **session** was created. Payment finishes on Paylands.
+Proforma 200 returns `orderId` and fee fields. It does **not** document `waiting-user` or `provider.uri`.
+
+## Execute
+
+```http
+POST /v1/teller/order
+```
+
+```json
+{ "orderId": "<proforma orderId>" }
+```
+
+On HTTP 200 (`ExecuteOrderData`) you typically receive `orderId`, `status` (`waiting-user` when the user must pay), `token`, and `provider.requestConfiguration.uri`. Open that URI for the user.
+
+HTTP 200 on execute means the **checkout session** was created. Payment finishes on Paylands.
 
 ## UX rules (critical)
 
 | | Google Pay | Apple Pay |
 | --- | --- | --- |
-| API | `method: "google-pay"` | `method: "apple-pay"` |
+| API | `"method": { "type": "google-pay" }` | `"method": { "type": "apple-pay" }` |
 | Open the URI | In-app WebView is OK | **Do not** use WebView or iframe |
 | Apple constraint | — | Open in **Safari / system browser** |
 
@@ -69,4 +85,4 @@ This does not override Apple’s WebView rule.
 | `teller.deposit.card.success` | Legacy; prefer `teller-order-v1` |
 | `wallet-transaction-v1` | Wallet movement (may include `tellerId`) |
 
-Optional poll: `GET /v1/teller/order/status`.
+Optional poll: `GET /v1/teller/order/status?id={orderId}`.

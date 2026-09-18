@@ -4,6 +4,8 @@ description: "Submit originator and beneficiary data with POST /v2/blockchain-ma
 keywords: ["Travel Rule", "pending-user-information", "travel-rule-order"]
 ---
 
+{/* COMPLIANCE_BLOCKER */}
+
 <Warning>
 This page describes the published API. It is not legal advice. Bit2Me Legal and Compliance must review KYC, KYB, Travel Rule, and 2FA copy before this portal is announced to partners.
 </Warning>
@@ -16,9 +18,9 @@ You **report Travel Rule data** to Bit2Me on the gateway. You do **not** use Emb
 POST /v2/blockchain-manager/travel-rule-order/{orderId}
 ```
 
-`{orderId}` is the withdrawal / transaction id from the address-book accept or Wallet execute response.
+`{orderId}` is the withdrawal id from the address-book **accept** response.
 
-Call this **only** when status is `pending-user-information` or `pending_user_information`. Skip it for every other status. Do not use Travel Rule v1 (`POST /v1/blockchain-manager/travel-rule-order/{orderId}` is deprecated).
+Call this **only** when status is `pending-user-information` (the enum on `POST .../draft/accept`). Skip it for every other status. Do not use Travel Rule v1 (`POST /v1/blockchain-manager/travel-rule-order/{orderId}` is deprecated).
 
 If the API asks for this payload and you do not send it, the operation stays in that status and is cancelled within a few hours. EUR thresholds are **not published** here.
 
@@ -32,11 +34,11 @@ Public FAQ (not a substitute for the API response): [Travel Rule frequently aske
 
 | Path | When you submit Travel Rule |
 | --- | --- |
-| [Address book](/partner/withdrawals-address-book) | After you accept the draft, **if** status is `pending-user-information` |
-| [Wallet legacy](/partner/withdrawals-wallet) | After execute, **if** GET transaction status is `pending_user_information` |
+| [Address book](/partner/withdrawals-address-book) | After you accept the draft, **if** the **201** `status` is `pending-user-information` |
+| [Wallet legacy](/partner/withdrawals-wallet) | Only if a later Wallet or WebSocket payload asks for it. `GET /v1/wallet/transaction/{id}` does **not** document a `status` field in this snapshot |
 
 Travel Rule is separate from **destination wallet verification**. Verifying a new on-chain address happens first (address book confirm, or the legacy movement confirmation). See those pages.
 
 <Info>
-Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com).
+Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com/en/support/tickets/new).
 </Info>

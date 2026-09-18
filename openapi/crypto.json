@@ -41,11 +41,19 @@
       "description": ""
     },
     {
-      "name": "Pro (Trading Spot)",
-      "description": "Spot trading also lives under the Pro Trading product REST tab."
+      "name": "Compliance",
+      "description": ""
     },
     {
-      "name": "Compliance",
+      "name": "Market",
+      "description": ""
+    },
+    {
+      "name": "Loan",
+      "description": ""
+    },
+    {
+      "name": "Misc",
       "description": ""
     }
   ],
@@ -122,7 +130,7 @@
           {
             "lang": "Js",
             "label": "Node",
-            "source": "const axios = require('axios');\nconst crypto = require('crypto');\n\nconst API_KEY = 'YOUR_API_KEY';\nconst SECRET = 'YOUR_API_SECRET';\n\nconst NONCE = Date.now();\nconst PATH = '/v1/signin/apikey';\nconst SERVER = 'https://gateway.bit2me.com';\n\nconst getAuthHeaders = (nonce, path, body) => {\n  const messageToSign = getClientMessageToSign(nonce, path, body);\n  const signature = getMessageSignature(messageToSign, SECRET);\n\n  return {\n    headers: {\n      'x-api-key': API_KEY,\n      'api-signature': signature,\n      'x-nonce': nonce\n    }\n  };\n};\n\nconst getClientMessageToSign = (nonce, url, body) => {\n  const hasBody = !!body;\n\n  return hasBody\n    ? `${nonce}:${url}:${JSON.stringify(body)}`\n    : `${nonce}:${url}`;\n};\n\nconst getMessageSignature = (message, secret) => {\n  const hash = crypto.createHash('sha256');\n  const hmac = crypto.createHmac('sha512', secret);\n  const hashDigest = hash.update(message).digest('binary');\n  const hmacDigest = hmac.update(hashDigest, 'binary').digest('base64');\n\n  return hmacDigest;\n};\n\nconst config = getAuthHeaders(NONCE, PATH, {});\naxios.post(`${SERVER}${PATH}`, {}, config).then(response=>console.log(response.data));\n"
+            "source": "const axios = require('axios');\nconst crypto = require('crypto');\n\nconst API_KEY = 'YOUR_API_KEY';\nconst SECRET = 'YOUR_API_SECRET';\n\nconst NONCE = Date.now();\nconst PATH = '/v1/signin/apikey';\nconst SERVER = 'https://gateway.bit2me.com';\n\nconst getAuthHeaders = (nonce, path, body) => {\n  const messageToSign = getClientMessageToSign(nonce, path, body);\n  const signature = getMessageSignature(messageToSign, SECRET);\n\n  return {\n    headers: {\n      'x-api-key': API_KEY,\n      'api-signature': signature,\n      'x-nonce': nonce\n    }\n  };\n};\n\nconst getClientMessageToSign = (nonce, url, body) => {\n  const hasBody = !!body && Object.keys(body).length > 0;\n\n  return hasBody\n    ? `${nonce}:${url}:${JSON.stringify(body)}`\n    : `${nonce}:${url}`;\n};\n\nconst getMessageSignature = (message, secret) => {\n  const hash = crypto.createHash('sha256');\n  const hmac = crypto.createHmac('sha512', secret);\n  const hashDigest = hash.update(message).digest('binary');\n  const hmacDigest = hmac.update(hashDigest, 'binary').digest('base64');\n\n  return hmacDigest;\n};\n\nconst config = getAuthHeaders(NONCE, PATH);\naxios.post(`${SERVER}${PATH}`, undefined, config).then(response=>console.log(response.data));\n"
           },
           {
             "lang": "Shell",
@@ -145,7 +153,9 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": "-accessToken",
+                "required": [
+                  "accessToken"
+                ],
                 "properties": {
                   "accessToken": {
                     "type": "string"
@@ -720,7 +730,7 @@
         ],
         "summary": "Execute transaction",
         "operationId": "performTransaction",
-        "description": "Executes a previuosly created transaction",
+        "description": "Executes a previously created transaction",
         "security": [
           {
             "ApiKeyAuth": []
@@ -840,7 +850,7 @@
         "tags": [
           "Wallet"
         ],
-        "summary": "List transactions",
+        "summary": "List transactions (v1, deprecated)",
         "operationId": "getTransaction",
         "description": "Obtains all transactions related to a pocket. If pocketId is not specified, all user's transactions are returned.\n\n Transactions can be paginated using **offset** and **limit** parameters. For example, to get the third page and show 20 registers per page you would use the following query:\n ```\n /v1/wallet/transaction?offset=40&limit=20\n ```\n Multiple filtering options could be applied when retrieving transactions. Example:\n ```\n /v1/wallet/transaction?pocketId=9a2dfa96-2fb8-4b76-a9bd-83949c417540&type=deposit\n ```",
         "security": [
@@ -1133,7 +1143,7 @@
         ],
         "summary": "Create transaction",
         "operationId": "createTransaction",
-        "description": "Creates a new proforma transaction (it includes an expiration time)\n\n If the *type* parameter is not specified, *REA* is used by default.\n\n The *destination* parameter only accepts one field (use *destination.address* to specify a crytocurrency address or *destination.pocket* to specify the ID of the destination pocket)\n\n **Security Constraints:** User's *email* **must** be validated in order to use this endpoint.\n\n For peer to peer transactions, a sell operation has to be made on source pocket and a buy operation has to be made on destination pocket\n\n **IMPORTANT:**  All blockchain withdrawals must be accompanied by Travel Rule information to be processed. Please [see](#tag/Funding/operation/provideTravelRuleInformationV2).",
+        "description": "Creates a new proforma transaction (it includes an expiration time)\n\n If the *type* parameter is not specified, *REA* is used by default.\n\n The *destination* parameter only accepts one field (use *destination.address* to specify a cryptocurrency address or *destination.pocket* to specify the ID of the destination pocket)\n\n **Security Constraints:** User's *email* **must** be validated in order to use this endpoint.\n\n For peer to peer transactions, a sell operation has to be made on source pocket and a buy operation has to be made on destination pocket\n\n **IMPORTANT:** Send Travel Rule data with POST /v2/blockchain-manager/travel-rule-order/{orderId} only when the withdrawal is in `pending-user-information`. See [Travel Rule](#tag/Funding/operation/provideTravelRuleInformationV2).",
         "security": [
           {
             "ApiKeyAuth": []
@@ -1395,7 +1405,7 @@
           {
             "name": "id",
             "in": "path",
-            "description": "The transaction id (returned by GET /v1/transaction)",
+            "description": "The transaction id (returned by GET /v1/wallet/transaction, GET /v2/wallet/transaction, or GET /v3/wallet/transaction)",
             "required": true,
             "schema": {
               "type": "string",
@@ -3644,7 +3654,7 @@
           {
             "lang": "Shell",
             "label": "cURL",
-            "source": "# Create subaccount\ncurl -X POST ${SERVER_URL}/v1/account/subaccount\n  -H 'Content-type: application/json'\n  -H 'X-API-KEY: <api key>'\n  -d '{\n    \"email\": \"<user email>\",\n    \"name\": \"<user name>\",\n    \"surname\": \"<user surname>\",\n    \"phone\": {\n      \"number\": \"<phoneNumber>\",\n      \"countryCode\": \"<countryCode>\",\n    },\n    \"type\": \"person\"\n  }'\n"
+            "source": "# Create subaccount\ncurl -X POST ${SERVER_URL}/v1/account/subaccount\n  -H 'Content-type: application/json'\n  -H 'X-API-KEY: <api key>'\n  -d '{\n    \"email\": \"<user email>\",\n    \"name\": \"<user name>\",\n    \"surname\": \"<user surname>\",\n    \"phone\": {\n      \"number\": \"<phoneNumber>\",\n      \"countryCode\": \"<countryCode>\"\n    },\n    \"type\": \"person\"\n  }'\n"
           }
         ]
       }
@@ -5025,7 +5035,7 @@
           }
         ],
         "summary": "Provide travel rule information",
-        "description": "The Travel Rule is a regulation that requires transfers of funds, including crypto assets, to include information about the originator and the beneficiary to prevent money laundering and terrorist financing. [More information](https://support.bit2me.com/en/support/solutions/articles/35000278021-travel-rule-frequently-asked-questions)\n\nWhen you create a blockchain withdrawal, its status will be set to `waiting-user-information`. To proceed with the transaction, you must send the required Travel Rule parameters. If this information is not provided, the operation will remain in this status and will be automatically canceled within a few hours.\n",
+        "description": "The Travel Rule is a regulation that requires transfers of funds, including crypto assets, to include information about the originator and the beneficiary to prevent money laundering and terrorist financing. [More information](https://support.bit2me.com/en/support/solutions/articles/35000278021-travel-rule-frequently-asked-questions)\n\nSend Travel Rule data only when the withdrawal is in `pending-user-information` (the enum on address-book accept). Do not assume every withdrawal requires this POST. If the API asks for this payload and you do not send it, the operation stays in that status and is cancelled within a few hours.\n",
         "operationId": "provideTravelRuleInformationV2",
         "parameters": [
           {
@@ -5142,7 +5152,7 @@
           }
         ],
         "summary": "Provide travel rule information",
-        "description": "Deprecated — use POST /v2/blockchain-manager/travel-rule-order/{orderId} instead.\n\nThe Travel Rule is a regulation that requires transfers of funds, including crypto assets, to include information about the originator and the beneficiary to prevent money laundering and terrorist financing. [More information](https://support.bit2me.com/en/support/solutions/articles/35000278021-travel-rule-frequently-asked-questions)\n\nWhen you create a blockchain withdrawal, its status will be set to `waiting-user-information`. To proceed with the transaction, you must send the required Travel Rule parameters. If this information is not provided, the operation will remain in this status and will be automatically canceled within a few hours.\n",
+        "description": "Deprecated — use POST /v2/blockchain-manager/travel-rule-order/{orderId} instead.\n\nThe Travel Rule is a regulation that requires transfers of funds, including crypto assets, to include information about the originator and the beneficiary to prevent money laundering and terrorist financing. [More information](https://support.bit2me.com/en/support/solutions/articles/35000278021-travel-rule-frequently-asked-questions)\n\nSend Travel Rule data only when the withdrawal is in `pending-user-information` (the enum on address-book accept). Do not assume every withdrawal requires this POST. If the API asks for this payload and you do not send it, the operation stays in that status and is cancelled within a few hours.\n",
         "operationId": "provideTravelRuleInformation",
         "parameters": [
           {
@@ -5696,7 +5706,7 @@
           {
             "lang": "Shell",
             "label": "cURL",
-            "source": "# Get subaccount order status\ncurl -X GET ${SERVER_URL}/v1/teller/order/status/<orderId>\n  -H 'Content-type: application/json'\n  -H 'X-API-KEY: <api key>'\n  -H 'X-SUBACCOUNT-ID: <subaccount id>'\n"
+            "source": "# Get subaccount order status\ncurl -X GET '${SERVER_URL}/v1/teller/order/status?id=<orderId>'\n  -H 'Content-type: application/json'\n  -H 'X-API-KEY: <api key>'\n  -H 'X-SUBACCOUNT-ID: <subaccount id>'\n"
           }
         ]
       }
@@ -6919,7 +6929,7 @@
             "ApiKeyAuth": []
           }
         ],
-        "summary": "Get OHLCA for a currency",
+        "summary": "Get OHLCV for a currency",
         "description": "Returns OHLCA for the given symbol",
         "operationId": "currencyOHLCA",
         "parameters": [
@@ -7635,7 +7645,7 @@
         "tags": [
           "Wallet"
         ],
-        "summary": "List transactions",
+        "summary": "List transactions (v2)",
         "operationId": "getTransactions",
         "description": "Get user transactions.\nTransactions can be paginated using **offset** and **limit** parameters. For example, to get the third page and show 20 registers per page you would use the following query:\n\n``` /v2/wallet/transaction?offset=40&limit=20 ```",
         "security": [
@@ -10127,7 +10137,12 @@
       },
       "CustomerRequestTransaction": {
         "type": "object",
-        "required": "-userId -amount -pair -createdAt",
+        "required": [
+          "userId",
+          "amount",
+          "pair",
+          "createdAt"
+        ],
         "properties": {
           "userId": {
             "$ref": "#/components/schemas/UserIdParam"

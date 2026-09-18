@@ -35,7 +35,7 @@ This is the **Bit2Me API** developer portal (Mintlify). It is a parallel site to
 ## Content boundaries
 
 - Do not invent endpoints, SLAs, uptime %, sunset dates, address-book TTLs, or Travel Rule EUR thresholds
-- Travel Rule only when status is `pending_user_information` / `pending-user-information`
+- Travel Rule only when status is `pending-user-information` (address-book accept enum). Do not document a second underscore form unless it appears in the snapshot.
 - Do not document `internal` notification channel as stable
 - Futures WS is limited availability until product/legal sign-off
 - No partner names, user IDs, or Jira keys on customer pages

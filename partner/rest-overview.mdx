@@ -3,7 +3,7 @@ title: "Partner REST overview"
 description: "Embed snapshot plus the Wallet/Funding routes partners actually call."
 ---
 
-The Partner **REST** tab highlights Embed (`openapi/embed.json`: subaccount, signin, account, and the callbacks Bit2Me posts to **your** backend).
+The Partner **REST** tab highlights Embed (`openapi/embed.json`: create subaccount, HMAC sign-in with `userId`, and the callbacks Bit2Me posts to **your** backend).
 
 Those callbacks are `POST /v1/b2m/transaction/authorize` (you approve or reject a widget operation) and `POST /v1/b2m/transaction/report` (Bit2Me notifies you that a widget operation happened). **`report` is not Travel Rule.** Submit Travel Rule on the gateway: [Travel Rule](/partner/travel-rule) (`POST /v2/blockchain-manager/travel-rule-order/{orderId}`).
 

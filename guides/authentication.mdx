@@ -37,14 +37,14 @@ The body used to sign **must** be the exact request body string:
 - JavaScript: `JSON.stringify(body)` (no spaces).
 - Python: `json.dumps(body, separators=(",", ":"))`.
 
-Do not mix pretty-printed JSON into the signature.
+Do not mix pretty-printed JSON into the signature. Do not POST `{}` on no-payload calls: an empty object is still a body and would be signed as `{}`.
 
 <CodeGroup>
 ```javascript Node.js
 const crypto = require("crypto");
 
 function getClientMessageToSign(nonce, url, body) {
-  const hasBody = !!body;
+  const hasBody = !!body && Object.keys(body).length > 0;
   return hasBody ? `${nonce}:${url}:${JSON.stringify(body)}` : `${nonce}:${url}`;
 }
 
@@ -125,7 +125,7 @@ Some operations require 2FA:
 
 For **subaccount** operations, `x-totp-type` is always `gauth`.
 
-Enroll subaccount 2FA with `POST /v1/account/subaccount/sfa` then `PUT /v1/account/subaccount/sfa`. Parent path `POST /v1/account/settings/sfa` is a different account. Details: [2FA 420 and 428](/recipes/totp).
+Enroll subaccount 2FA with `POST /v1/account/subaccount/sfa` (`subaccountUserId` in JSON) then `PUT /v1/account/subaccount/sfa` (`subaccountUserId` + `totp` in JSON). Parent enroll is `POST` then `PUT /v1/account/settings/sfa`. Withdrawal 2FA still uses `x-totp` headers. Details: [2FA 420 and 428](/recipes/totp).
 
 ## Playground
 

@@ -3,6 +3,8 @@ title: "Crypto withdrawals (address book)"
 description: "Verify a new destination wallet with 2FA, then draft, accept, and submit Travel Rule only if requested."
 ---
 
+{/* COMPLIANCE_BLOCKER */}
+
 <Warning>
 This page describes the published API. It is not legal advice. Bit2Me Legal and Compliance must review KYC, KYB, Travel Rule, and 2FA copy before this portal is announced to partners.
 </Warning>
@@ -73,10 +75,10 @@ flowchart TD
     ```
     This is how you **submit Travel Rule** (originator and beneficiary data). It is not Embed `report`.
 
-    Required **only** when status is `pending-user-information` (OpenAPI) or `pending_user_information` (Wallet GET). Full field notes: [Travel Rule](/partner/travel-rule). Do not use Travel Rule v1. If requested and not sent, the operation stays in that status and is cancelled within a few hours. EUR threshold is not published here.
+    Required **only** when the accept **201** `status` is `pending-user-information`. Full field notes: [Travel Rule](/partner/travel-rule). Do not use Travel Rule v1. If requested and not sent, the operation stays in that status and is cancelled within a few hours. EUR threshold is not published here.
   </Step>
 </Steps>
 
 <Info>
-Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com).
+Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com/en/support/tickets/new).
 </Info>

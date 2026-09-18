@@ -3,6 +3,8 @@ title: "Partner overview"
 description: "B2B2C journeys: onboard end users, fund fiat, exchange, and withdraw crypto."
 ---
 
+{/* COMPLIANCE_BLOCKER */}
+
 Use the Partner product when you distribute Bit2Me to **your** customers. You hold parent API keys. Each end user is one subaccount.
 
 <Warning>
@@ -22,7 +24,7 @@ This page describes the published API. It is not legal advice. Bit2Me Legal and 
     Identity in a native browser. Add card in a WebView.
   </Card>
   <Card title="Funding" href="/partner/fiat">
-    Bank, card, Apple Pay, Google Pay, PIX via Teller / Paylands.
+    Bank, card, Apple Pay, Google Pay, and Teller / Paylands rails in your contract.
   </Card>
   <Card title="Withdrawals" href="/partner/withdrawals-address-book">
     Verify the destination wallet, then draft and accept. Address book is the target path.
@@ -41,9 +43,9 @@ This page describes the published API. It is not legal advice. Bit2Me Legal and 
 - Do not treat the user as live until KYC `status: verified` and `tier: 2` (persons).
 - Do not call identity init on `type: company`.
 - The first time a subaccount sends crypto to a new blockchain address, [verify that destination](/partner/withdrawals-address-book) with 2FA before you withdraw.
-- Travel Rule is [its own gateway call](/partner/travel-rule), only when status is `pending-user-information` / `pending_user_information`. Do not use Embed `report` for this.
+- Travel Rule is [its own gateway call](/partner/travel-rule), only when address-book accept status is `pending-user-information`. Do not use Embed `report` for this.
 - Apple Pay must leave the in-app WebView.
 
 <Info>
-Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com).
+Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com/en/support/tickets/new).
 </Info>

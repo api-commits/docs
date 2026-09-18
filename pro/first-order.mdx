@@ -4,7 +4,7 @@ description: "Place a signed Pro spot order with a known HMAC fixture."
 ---
 
 <Info>
-Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com).
+Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com/en/support/tickets/new).
 </Info>
 
 <Steps>
@@ -30,23 +30,19 @@ Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout 
     POST /v1/trading/wallet/deposit
     ```
 
-    HTTP **412** is insufficient Pro funds (including fees).
+    Required body: `fromPocketId`, `amount`, `currency` (strings). This operation documents **403** (invalid credentials) and **404** (wallet not found), not 412.
   </Step>
   <Step title="Place the order">
     ```http
     POST /v1/trading/order
     ```
-    Example body (sign `nonce:path:` plus compact `JSON.stringify(body)`). Pro symbols use a slash (`BTC/EUR`), not MCP `BTC-EUR`:
+    Sign `nonce:path:` plus the **exact** compact JSON bytes on the wire (`JSON.stringify` with no spaces). Pro symbols use a slash (`BTC/EUR`), not MCP `BTC-EUR`. Compact body:
 
     ```json
-    {
-      "side": "buy",
-      "symbol": "BTC/EUR",
-      "price": "50000",
-      "amount": "0.01",
-      "orderType": "limit"
-    }
+    {"side":"buy","symbol":"BTC/EUR","price":"50000","amount":"0.01","orderType":"limit"}
     ```
+
+    On this operation, HTTP **412** means price or amount is outside the market min/max from `GET /v1/trading/market-config`. The snapshot does not document **417** here. Wallet **412** (pocket funds) is a different API.
 
     Sample: [trading-spot-samples REST trading](https://github.com/bit2me-devs/trading-spot-samples/tree/main/node/rest/trading).
   </Step>
@@ -55,6 +51,6 @@ Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout 
   </Step>
 </Steps>
 
-Amounts are strings. Use `.` for decimals. HTTP **412** insufficient funds; **417** amount outside market limits.
+Amounts are strings. Use `.` for decimals.
 
 Optional: stream fills on `wss://ws.bit2me.com/v1/trading` after [WsAuth](/pro/websocket).

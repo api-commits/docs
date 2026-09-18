@@ -3,12 +3,13 @@ title: "Earn"
 description: "Staking positions, rewards, and movements on the Wallet API."
 ---
 
-Earn (staking) lives on the gateway under `/v1/earn/*`. REST pages are generated from the Wallet OpenAPI snapshot.
+Earn (staking) lives on the gateway. List wallets with `GET /v2/earn/wallets`. Other reads still use `/v1/earn/…` as listed below. REST pages are generated from the Wallet OpenAPI snapshot.
 
 Typical reads:
 
 | Call | Use |
 | --- | --- |
+| `GET /v2/earn/wallets` | List Earn wallets |
 | `GET /v1/earn/summary` | Aggregated rewards |
 | `GET /v1/earn/wallets/{walletId}` | One Earn wallet |
 | `GET /v1/earn/wallets/{walletId}/movements` | Movement history |
@@ -20,5 +21,5 @@ Use the [REST reference](/wallet/rest-overview) for request bodies. Do not inven
 Internal Wallet ↔ Earn transfers are supported.
 
 <Info>
-Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com).
+Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com/en/support/tickets/new).
 </Info>

@@ -169,44 +169,6 @@
                 ]
               },
               {
-                "group": "Pro",
-                "pages": [
-                  "pro/overview",
-                  "pro/first-order",
-                  "pro/market-data",
-                  "pro/websocket",
-                  "pro/websocket-public",
-                  "pro/websocket-private",
-                  "pro/websocket-futures"
-                ]
-              },
-              {
-                "group": "Partners",
-                "pages": [
-                  "partner/overview",
-                  "partner/architecture",
-                  "partner/kyc",
-                  "partner/kyb",
-                  "partner/fiat",
-                  "partner/apple-google-pay",
-                  "partner/withdrawals-address-book",
-                  "partner/withdrawals-wallet",
-                  "partner/travel-rule",
-                  "partner/transfers",
-                  "partner/widgets"
-                ]
-              },
-              {
-                "group": "AI",
-                "pages": [
-                  "ai/overview",
-                  "ai/cursor",
-                  "ai/claude",
-                  "ai/tools",
-                  "ai/errors"
-                ]
-              },
-              {
                 "group": "Troubleshoot",
                 "pages": [
                   "recipes/hmac-401",

@@ -1,6 +1,6 @@
 ---
 title: "Market data"
-description: "Pro OHLCV intervals, the 720-candle historical window, and public book and trades."
+description: "Pro OHLCV intervals, public book and trades, and the published limit cap."
 ---
 
 Pro market data is public REST. You do not need an API key for these GETs. Server: `https://gateway.bit2me.com`.
@@ -15,12 +15,12 @@ Pro market data is public REST. You do not need an API key for these GETs. Serve
 Official sample: [get-ohlcv](https://github.com/bit2me-devs/trading-spot-samples/blob/main/node/rest/market-data/get-ohlcv).
 
 <Info>
-Check [status.bit2me.com](https://status.bit2me.com) before you debug empty candles or 5xx. If the platform is healthy and this persists, [open a support ticket](https://support.bit2me.com).
+Check [status.bit2me.com](https://status.bit2me.com) before you debug empty candles or 5xx. If the platform is healthy and this persists, [open a support ticket](https://support.bit2me.com/en/support/tickets/new).
 </Info>
 
 ## Candle intervals (Pro)
 
-`GET /v1/trading/candle` requires `symbol`, `interval`, `startTime`, `endTime`, and `limit`. OpenAPI `interval` is **minutes**:
+`GET /v1/trading/candle` requires `symbol`, `interval`, `startTime`, `endTime`, and `limit`. `startTime` / `endTime` are Unix time in **milliseconds**. OpenAPI `interval` is **minutes**:
 
 | `interval` | Meaning |
 | --- | --- |
@@ -34,33 +34,9 @@ Check [status.bit2me.com](https://status.bit2me.com) before you debug empty cand
 
 The last entry in the array is the **current** (in-progress) candle. OpenAPI documents `limit` with a maximum of **1000**.
 
-## Historical window (720 candles)
+Page with a new `startTime` / `endTime` window if you need more history than one response. Do not invent extra caps.
 
-Historicals return **720 candles** per request. Size `startTime` / `endTime` (and `limit`) around that. The span you cover is `720 × interval`.
-
-For Pro minute intervals:
-
-| If you choose `interval`… | The 720-candle window is about… |
-| --- | --- |
-| `60` (1 hour) | 30 days (720 hours) |
-| `1440` (1 day) | ~2 years (720 days) |
-| `240` (4 hours) | 120 days |
-| `30` | 15 days |
-| `15` | 7.5 days |
-| `5` | 2.5 days |
-| `1` | 12 hours |
-
-Named Wallet Market intervals (`one_hour`, `one_day`, `one_week`, `one_month`, `one_year` on currency ticker queries) use the same **720-point** rule:
-
-| If you choose the interval… | The 720-point window is about… |
-| --- | --- |
-| `one_hour` (1 hour) | 30 days (720 hours / 24) |
-| `one_day` (1 day) | ~2 years (720 days) |
-| `one_week` (1 week) | ~13.8 years (720 weeks). The theoretical span is not useful in practice. |
-| `one_month` (1 month) | 60 years (720 months). The theoretical span is not useful in practice. |
-| `one_year` (1 year) | 720 years. The theoretical span is not useful in practice. |
-
-Do not invent extra caps or sunset dates. If you need a longer history than one 720-candle page, page with a new `startTime` / `endTime` on the next window.
+Wallet Market catalog (`GET /v3/currency/ticker/{symbol}` and named intervals such as `one_hour`) is a **different** HMAC surface under Wallet REST **Market**. Do not mix those interval names with Pro `GET /v1/trading/candle`.
 
 ## Live book and trades
 

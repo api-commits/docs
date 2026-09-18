@@ -5,6 +5,8 @@ description: "Create and list currency pockets under a parent or subaccount wall
 
 A pocket is an optional sub-ledger per currency (EUR, BTC, ETH, and others). You can also operate at wallet level.
 
+Wallet buy, sell, and swap use **pocket UUIDs** in the request body. Do not send Pro-style pair strings such as `BTC/EUR` on those Wallet calls.
+
 Every call for an end user must include `X-SUBACCOUNT-ID` after you create the subaccount. See [Account model](/guides/account-model).
 
 ## List pockets
@@ -41,5 +43,5 @@ Exact request fields are in the [REST reference](/api-reference/wallet/create-po
 </Steps>
 
 <Info>
-Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com).
+Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com/en/support/tickets/new).
 </Info>

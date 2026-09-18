@@ -6,7 +6,7 @@ description: "Bank transfer, card, PIX, and Teller orders for EUR (and other rai
 Fiat collection uses the **Funding / Teller** family. Crypto stays in subaccount pockets until you withdraw on-chain.
 
 <Info>
-Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com).
+Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com/en/support/tickets/new).
 </Info>
 
 ## Prerequisites
@@ -19,20 +19,40 @@ Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout 
 ## Deposit instructions
 
 ```http
-GET /v1/teller/pocket/reference
+GET /v1/teller/pocket/reference?pocketId={pocketId}
 ```
 
-Use this for bank-transfer details tied to a pocket (EUR). Listen for `teller.deposit.transfer.success` and `teller-order-v1`.
+`pocketId` is required. Use this for bank-transfer details tied to a pocket (EUR). Listen for `teller.deposit.transfer.success` and `teller-order-v1`.
 
-## Teller proforma
+## Teller proforma then execute
 
 ```http
 POST /v1/teller/order/proforma
 ```
 
-Then complete payment at the provider URL. Confirm with `GET /v1/teller/order/status` and WebSocket `teller-order-v1`.
+Required: `amount`, `currency`, `orderType` (`deposit` or `purchase`), and `method` as an **object**:
 
-Documented `method` values include `creditCard`, `google-pay`, `apple-pay`, and `hub-latam` (LATAM rails such as PIX). See [Apple Pay and Google Pay](/partner/apple-google-pay).
+```json
+{
+  "amount": "10",
+  "currency": "EUR",
+  "orderType": "deposit",
+  "method": { "type": "apple-pay" },
+  "destination": { "type": "pocket", "value": "<EUR pocket UUID>" }
+}
+```
+
+`method.type` enum: `creditcard`, `google-pay`, `apple-pay`, `hub-latam`. That is **not** a string at the `method` key, and it is not `creditCard`.
+
+Proforma **200** is `CreateOrderData` (`orderId` plus amounts and fees). Then execute:
+
+```http
+POST /v1/teller/order
+```
+
+Body: `{ "orderId": "<id from proforma>" }`. Execute **200** is `ExecuteOrderData`: `status` (including `waiting-user`), `token`, and `provider.requestConfiguration.uri`. Open that URI for the user. See [Apple Pay and Google Pay](/partner/apple-google-pay).
+
+Confirm with `GET /v1/teller/order/status?id={orderId}` and WebSocket `teller-order-v1`. `hub-latam` covers LATAM rails; the snapshot does not name PIX.
 
 ## Fiat withdrawals
 

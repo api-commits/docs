@@ -3,6 +3,8 @@ title: "KYC (end user)"
 description: "Eight steps to verify a natural-person subaccount."
 ---
 
+{/* COMPLIANCE_BLOCKER */}
+
 <Warning>
 This page describes the published API. It is not legal advice. Bit2Me Legal and Compliance must review KYC, KYB, Travel Rule, and 2FA copy before this portal is announced to partners.
 </Warning>
@@ -18,27 +20,20 @@ Legal entities use [KYB](/partner/kyb) — do not mix this flow into companies.
 | Parent | Your institution is already onboarded |
 | Per end user | One subaccount (`userId` UUID) |
 | After create | `X-SUBACCOUNT-ID: {userId}` on every call |
-| Consent | User accepts **general** and **privacy-policy** in **your** UI before you create the subaccount |
+| Consent | User accepts **general** and **privacy-policy** terms in **your** UI before you create the subaccount |
+
+Terms download paths are not in this OpenAPI snapshot. Store the document versions the user accepted in your application.
 
 ```mermaid
 flowchart LR
-  A[1. Fetch T&C] --> B[2. User accepts in your app]
-  B --> C[3. Create subaccount]
-  C --> D[4. AML profile]
-  D --> E[5. Address]
-  E --> F[6. Documents]
-  F --> G[7. Identity web session]
-  G --> H[8. Monitor verified tier 2]
+  A[1. User accepts terms] --> B[2. Create subaccount]
+  B --> C[3. AML profile]
+  C --> D[4. Address]
+  D --> E[5. Identity web session]
+  E --> F[6. Monitor verified tier 2]
 ```
 
 <Steps>
-  <Step title="Fetch Terms & Conditions">
-    ```http
-    GET /v1/terms-and-conditions/subject/general/language/{language}/latest
-    GET /v1/terms-and-conditions/subject/privacy-policy/language/{language}/latest
-    ```
-    Language is BCP-47 (`es-ES`, `en-GB`, `fr-FR`). Store `termsAndConditionsId` for audit.
-  </Step>
   <Step title="Record acceptance in your application">
     Store who accepted, when, and which document versions. Do not create the subaccount until this is done.
   </Step>
@@ -46,44 +41,36 @@ flowchart LR
     ```http
     POST /v1/account/subaccount
     ```
-    Result: `userId`. From now on send `X-SUBACCOUNT-ID`. Initial acceptance is recorded on create — you do not need a separate terms POST for first onboarding.
+    Required body fields in the snapshot: `email`, `name`, `surname`, `phone`. Optional `type` (`person` or `company`). Result: `userId`. From now on send `X-SUBACCOUNT-ID`.
   </Step>
   <Step title="Update the AML profile">
     ```http
     PUT /v1/account/update
     ```
-    Include `nationalityCountryCode`, `employmentStatus`, `profession`, `accountPurpose`, `depositEstimation`, `fundsOrigin`.
+    Send person AML fields under **`person`**: `nationalityCountryCode`, `employmentStatus`, `profession`. Also send `depositEstimation` and `fundsOrigin` at the root when required.
 
-    **Do not** send `name`, `surname`, or `birthDate` — identity verification collects those.
+    **Do not** send `person.name`, `person.surname`, or `person.birthDate` — identity verification collects those. `accountPurpose` is a **GET** `/v3/account` field, not a PUT field.
 
-    Validate enums first: `GET /v1/account/employment-status`, `/v1/account/purposes`, `/v1/account/funds-origin`.
+    Validate enums first: `GET /v1/account/employment-status`, `GET /v1/account/purposes`, `GET /v1/account/funds-origin`.
   </Step>
   <Step title="Register the physical address">
     ```http
     POST /v2/account/address
     ```
-    Required: `streetAddress`, `city`, `stateCode`, `zip`, `countryCode`.
-  </Step>
-  <Step title="Upload compliance documents">
-    Proof of address: `POST /v2/account/user/documentation/docs/bulk`. Proof of funds: `POST /v2/account/sign-document/source-of-funds-pf`.
+    Required: `streetAddress`, `city`, `stateCode`, `zip`, `countryCode`, `nationalityCountryCode`. `stateCode` is the FIPS value from `GET /v1/misc/country/{countryISOCode}/region`.
   </Step>
   <Step title="Identity verification">
     ```http
     POST /v3/account/verify/identity/init
     ```
     Body: `locale` (required); optional `workflowId` (default `10011`), `successUrl`, `errorUrl`. Open **`redirectUrl`** in a **native system browser**. See [Identity widget](/partner/embed-identity).
+
+    Proof-of-address and proof-of-funds upload paths are not in this snapshot. Complete any extra document requests your onboarding contact specifies before you treat the user as live.
   </Step>
   <Step title="Monitor until verified">
     REST: `GET /v1/account/verify/identity`. Real-time: WebSocket `identity.validated`.
 
-    Success:
-
-    ```json
-    {
-      "status": "verified",
-      "tier": 2
-    }
-    ```
+    Success in the snapshot is `status: verified`. `tier` is optional. Treat the user as live only when `status` is `verified` and `tier` is `2` when that field is present.
 
     Optional artifacts: `GET /v1/verifier/subaccount/file`.
   </Step>
@@ -92,12 +79,12 @@ flowchart LR
 ## Common mistakes
 
 1. Creating the subaccount before the user accepts terms in your app.
-2. Sending name / surname / birthDate in the AML profile.
+2. Sending name / surname / birthDate on the AML `PUT`.
 3. Embedding identity in a WebView without camera or microphone.
 4. Uploading partner-captured ID or liveness.
-5. Skipping address or proof of funds before identity init.
-6. Treating the user as live before `verified` and `tier: 2`.
+5. Omitting `nationalityCountryCode` on the address.
+6. Treating the user as live before `verified` (and `tier: 2` when returned).
 
 <Info>
-Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com).
+Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com/en/support/tickets/new).
 </Info>
