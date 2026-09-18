@@ -1,0 +1,27 @@
+---
+title: "Private channels"
+description: "my-trades, my-orders, executions, my-balance, my-working-capital."
+---
+
+Authenticate first ([Pro WebSocket](/pro/websocket)). Optionally filter by `symbol`.
+
+| Channel | Subscribe `name` | Sample |
+| --- | --- | --- |
+| Your fills | `my-trades` | [get-my-trades](https://github.com/bit2me-devs/trading-spot-samples/tree/main/node/ws/private/get-my-trades) |
+| Your orders | `my-orders` | [get-my-orders](https://github.com/bit2me-devs/trading-spot-samples/tree/main/node/ws/private/get-my-orders) |
+| Orders + fills | `executions` | [get-executions](https://github.com/bit2me-devs/trading-spot-samples/tree/main/node/ws/private/get-executions) |
+| Balances | `my-balance` | [get-my-balance](https://github.com/bit2me-devs/trading-spot-samples/tree/main/node/ws/private/get-my-balance) |
+| Working capital | `my-working-capital` | [get-my-working-capital](https://github.com/bit2me-devs/trading-spot-samples/tree/main/node/ws/private/get-my-working-capital) |
+
+```json
+{
+  "event": "subscribe",
+  "subscription": { "name": "my-orders" }
+}
+```
+
+If you subscribed with a `symbol`, unsubscribe with that same `symbol`.
+
+`executions` delivers both `my-orders` and `my-trades` events on one subscription.
+
+Command rate limits apply to this connection — see the Pro WS spec notes and [Rate limits](/guides/rate-limits).

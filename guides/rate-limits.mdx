@@ -1,0 +1,33 @@
+---
+title: "Rate limits"
+description: "Starter, Medium, and Pro request-per-minute limits for the Bit2Me API."
+keywords: ["429", "418", "RPM", "rate limit"]
+---
+
+All gateway HTTP endpoints enforce usage limits. Exceeding them can return:
+
+| Code | Meaning |
+| --- | --- |
+| **429** | Too many requests in the timeframe |
+| **418** | The user has been banned from accessing the API |
+
+| Tier | Max RPM |
+| --- | --- |
+| Starter | 600 |
+| Medium | 800 |
+| Pro | 1000 |
+
+To request a new tier, contact [support](https://support.bit2me.com). Do not assume an ad-hoc raise.
+
+WebSocket connections share rate limiting with HTTP in the notification channel:
+
+- More than **50 concurrent connections** from the same IP → handshake **429**
+- More than **50 messages per second** on a connection → close **4001**
+
+Pro Trading WebSocket command limits are documented with that API. See [Pro WebSocket](/pro/websocket).
+
+<Tip>
+If you receive 429, back off and retry. Check [status.bit2me.com](https://status.bit2me.com) if failures cluster. If this persists, [open a support ticket](https://support.bit2me.com).
+</Tip>
+
+Stay inside the published RPM. Repeated violations can lead to **418**.

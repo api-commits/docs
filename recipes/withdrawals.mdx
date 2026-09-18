@@ -1,0 +1,17 @@
+---
+title: "Which withdrawal path?"
+description: "Address book vs Wallet legacy, and when Travel Rule applies."
+---
+
+| Path | Use |
+| --- | --- |
+| [Address book](/partner/withdrawals-address-book) | Current OpenAPI target for subaccounts: verified destination → draft → accept |
+| [Wallet legacy](/partner/withdrawals-wallet) | Still live: proforma + execute with `destination.address` |
+
+Travel Rule (`POST /v2/blockchain-manager/travel-rule-order/{id}`) **only** when status is `pending-user-information` / `pending_user_information`. Skip it otherwise.
+
+Do not use Travel Rule v1. Do not invent TTLs, sunset dates, or EUR thresholds.
+
+<Info>
+Check [status.bit2me.com](https://status.bit2me.com) before opening a ticket. If this persists, [open a support ticket](https://support.bit2me.com).
+</Info>

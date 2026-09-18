@@ -1,0 +1,27 @@
+---
+title: "Embed widgets"
+description: "Two launch patterns: identity in a native browser, add-card in a WebView."
+---
+
+| Feature | How you launch it | Container |
+| --- | --- | --- |
+| **Identity verification** | `POST /v3/account/verify/identity/init` → open `redirectUrl` | **Native browser** (Safari, Chrome Custom Tab) — not a restricted WebView |
+| **Add card** | `https://embed.bit2me.com/add-card?t={token}&lang={language}` | **In-app WebView** |
+
+Do not use the add-card WebView for identity: camera and microphone will fail.
+
+Both flows need a subaccount `userId`. Your **backend** obtains a session token:
+
+```http
+POST https://gateway.bit2me.com/v1/signin/apikey
+```
+
+```json
+{
+  "userId": "{subaccount_uuid}"
+}
+```
+
+Use `accessToken.token` as `t` on Embed URLs. Sign the call with parent HMAC. See [Identity](/partner/embed-identity) and [Add card](/partner/embed-add-card).
+
+Other Embed URL: `https://embed.bit2me.com/dashboard?t={token}&lang={lang}` (buy/sell/swap dashboard). Same `t` and `lang` rules (`en`, `es`, `pt`).

@@ -1,0 +1,27 @@
+---
+title: "Loans"
+description: "Crypto-backed loans: simulate LTV, create an order, increase guarantee, pay back."
+---
+
+Loan routes live under `/v1/loan/*`.
+
+| Call | Use |
+| --- | --- |
+| `GET /v1/loan/ltv` | Loan-to-value data |
+| `GET /v1/loan/orders` | List loan orders |
+| `POST /v1/loan/orders` | Create a loan |
+| `GET /v1/loan/orders/{orderId}` | One order |
+| `POST /v1/loan/orders/{orderId}/guarantee/increase` | Add collateral |
+| `POST /v1/loan/orders/{orderId}/payback` | Repay |
+| `GET /v1/loan/movements` | History |
+
+WebSocket types (when subscribed to gateway notifications):
+
+- `loan-ltv-risk-v1` — `orderId`, `percentage`, `riskType` (`medium` or `high`)
+- `loan-liquidated-v1` — `orderId`, `status`, `ltv`
+
+Do not publish APR or liquidation thresholds that are not in the live response. Read them from the API.
+
+<Info>
+Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com).
+</Info>

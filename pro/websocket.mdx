@@ -1,0 +1,47 @@
+---
+title: "Pro WebSocket"
+description: "Connect to wss://ws.bit2me.com/v1/trading, authenticate, subscribe."
+---
+
+URL: **`wss://ws.bit2me.com/v1/trading`**.
+
+Public channels need no login. Private channels and order commands need a token from `POST /v1/signin/apikey`. That token is valid **1 minute** — authenticate on the socket within that window.
+
+<Info>
+Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com).
+</Info>
+
+## Get a token
+
+```bash
+curl --location --request POST 'https://gateway.bit2me.com/v1/signin/apikey' \
+  -H 'Content-type: application/json' \
+  -H 'X-API-KEY: <api key>' \
+  -H 'api-signature: <sign message>' \
+  -H 'x-nonce: <nonce>'
+```
+
+Sample: [https://github.com/bit2me-devs/trading-spot-samples/blob/main/node/auth/ws.js](https://github.com/bit2me-devs/trading-spot-samples/blob/main/node/auth/ws.js).
+
+## Authenticate on the socket
+
+```json
+{
+  "event": "authenticate",
+  "token": "the-token"
+}
+```
+
+Success:
+
+```json
+{
+  "event": "authenticate"
+}
+```
+
+Error example: event `authenticate` with `error` set to `jwt expired`.
+
+Then subscribe. See [Public channels](/pro/websocket-public) and [Private channels](/pro/websocket-private).
+
+This surface is **not** the gateway notification socket. Notifications (wallet, KYC, teller) are documented under [Wallet → Notifications](/wallet/websocket).

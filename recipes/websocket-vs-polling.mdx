@@ -1,0 +1,15 @@
+---
+title: "WebSocket vs polling"
+description: "Use notifications for status; poll as a fallback, not a hot loop."
+---
+
+| Need | Prefer |
+| --- | --- |
+| KYC done | Gateway WS `identity.validated` + occasional `GET /v1/account/verify/identity` |
+| Fiat deposit | `teller-order-v1` |
+| Wallet movement | `wallet-transaction-v1` |
+| Pro fills | `wss://ws.bit2me.com/v1/trading` `my-trades` / `executions` |
+
+Polling REST in a tight loop hits [rate limits](/guides/rate-limits). Reconnect the socket with backoff. These are **three** sockets — do not mix gateway notifications with Pro trading or Futures.
+
+Guides: [Gateway notifications](/wallet/websocket), [Pro WebSocket](/pro/websocket).

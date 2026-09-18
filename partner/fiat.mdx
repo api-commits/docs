@@ -1,0 +1,41 @@
+---
+title: "Fiat deposits and withdrawals"
+description: "Bank transfer, card, PIX, and Teller orders for EUR (and other rails in your contract)."
+---
+
+Fiat collection uses the **Funding / Teller** family. Crypto stays in subaccount pockets until you withdraw on-chain.
+
+<Info>
+Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com).
+</Info>
+
+## Prerequisites
+
+1. Parent KYB complete.
+2. Subaccount created and, for persons, KYC `verified` / `tier: 2`.
+3. Fiat pocket for the currency.
+4. `x-subaccount-id` plus HMAC headers.
+
+## Deposit instructions
+
+```http
+GET /v1/teller/pocket/reference
+```
+
+Use this for bank-transfer details tied to a pocket (EUR). Listen for `teller.deposit.transfer.success` and `teller-order-v1`.
+
+## Teller proforma
+
+```http
+POST /v1/teller/order/proforma
+```
+
+Then complete payment at the provider URL. Confirm with `GET /v1/teller/order/status` and WebSocket `teller-order-v1`.
+
+Documented `method` values include `creditCard`, `google-pay`, `apple-pay`, and `hub-latam` (LATAM rails such as PIX). See [Apple Pay and Google Pay](/partner/apple-google-pay).
+
+## Fiat withdrawals
+
+Bank withdrawals are a separate Funding path from crypto withdrawals. Follow the Funding tag in the REST reference. Do not reuse the address-book crypto flow for SEPA/PIX out.
+
+USD availability on Wallet is not documented as generally available — confirm with sales if you need USD.

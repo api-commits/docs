@@ -1,0 +1,33 @@
+---
+title: "Money flow"
+description: "How value moves between Wallet, Pro, Earn, and funding rails."
+---
+
+The public Money Flow spec is a diagram pack, not a REST catalog. Use this page as a map; the live numbers always come from pockets, Pro balances, and teller orders.
+
+```mermaid
+flowchart LR
+  Fiat[Fiat in — bank, card, Apple Pay, Google Pay, PIX]
+  Wallet[Wallet pockets]
+  Pro[Pro Trading]
+  Earn[Earn]
+  Loan[Loans]
+  Out[Crypto out — address book or Wallet legacy]
+  Fiat --> Wallet
+  Wallet --> Pro
+  Pro --> Wallet
+  Wallet --> Earn
+  Earn --> Wallet
+  Wallet --> Loan
+  Wallet --> Out
+```
+
+| Rail | Guide |
+| --- | --- |
+| Fiat deposit | [Fiat funding](/partner/fiat), [Apple Pay / Google Pay](/partner/apple-google-pay) |
+| Buy / sell | [Buy, sell, and swap](/wallet/buy-sell) |
+| Spot orders | [First order](/pro/first-order) |
+| On-chain out | [Address book withdrawals](/partner/withdrawals-address-book) |
+| P2P | [Social Pay vs pocket transfer](/partner/transfers) |
+
+SVG diagrams from the Money Flow OpenAPI (`trading-money-flows`, `earn-money-flows-a-end-users`) are not copied here. Follow REST responses for fees and pocket debits.

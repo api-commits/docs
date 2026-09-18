@@ -1,0 +1,28 @@
+---
+title: "Fix HMAC 401"
+description: "Clock, nonce window, header names, and the known-answer fixture."
+---
+
+<Info>
+Check [status.bit2me.com](https://status.bit2me.com) before opening a ticket. If this persists, [open a support ticket](https://support.bit2me.com).
+</Info>
+
+<Steps>
+  <Step title="Sync the clock">
+    HMAC uses Unix time. The documented nonce window is **5 seconds**. Enable NTP.
+  </Step>
+  <Step title="Match the message exactly">
+    No body: `{nonce}:{path}`. JSON body: `{nonce}:{path}:{JSON.stringify(body)}`. Path is the request path including `/v1/...`, not the full URL.
+  </Step>
+  <Step title="Hash then HMAC">
+    SHA-256 (binary) → HMAC-SHA512 with the **secret** → Base64 → `api-signature`. Send `x-api-key` and `x-nonce` too.
+  </Step>
+  <Step title="Unit-test the fixture">
+    Secret `example_secret_do_not_use_in_production`, nonce `1687155308`, GET `/v1/trading/wallet/balance` must produce `IgazRn9MPHcJjAfhrVHzI46U9iIDb7qbXYcTIN+9vrktJ6M4rET7WH+wasF+/8Thp9tzjkWaFCL8ASSzlY4D8g==`. Full table: [Authentication](/guides/authentication).
+  </Step>
+  <Step title="Trim secrets">
+    Extra spaces in `.env` fail 401. Rotate the key if it leaked. Do not paste secrets into tickets.
+  </Step>
+</Steps>
+
+Reference implementation: [trading-spot-samples `node/auth`](https://github.com/bit2me-devs/trading-spot-samples/tree/main/node/auth). `bit2me-api-node-tool` is discontinued.

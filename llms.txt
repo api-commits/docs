@@ -1,0 +1,53 @@
+# Bit2Me API
+
+> Developer documentation for the Bit2Me gateway REST API, Pro Trading, partner onboarding, WebSockets, and MCP.
+
+Server: https://gateway.bit2me.com
+Current Scalar reference (parallel): https://api.bit2me.com/doc
+Status: https://status.bit2me.com
+Support: https://support.bit2me.com
+API keys: https://account.bit2me.com/api-keys
+MCP: https://mcp.bit2me.com
+OpenAPI snapshots in this repo: openapi/crypto.json, openapi/trading-spot-rest.json, openapi/embed.json
+
+Do not invent endpoints, SLAs, sunset dates, or Travel Rule thresholds. HMAC cannot be computed in the Mintlify playground.
+
+## Get started
+
+- [Home](https://bit2me.com): Product path chooser
+- [Quickstart](/quickstart.mdx)
+- [Account model](/guides/account-model.mdx)
+- [Authentication (HMAC fixture)](/guides/authentication.mdx)
+- [Rate limits](/guides/rate-limits.mdx)
+- [Errors](/guides/errors.mdx)
+
+## Wallet
+
+- [Pockets](/wallet/pockets.mdx)
+- [Buy, sell, and swap](/wallet/buy-sell.mdx)
+- [Earn](/wallet/earn.mdx)
+- [Loans](/wallet/loans.mdx)
+- [Gateway notifications](/wallet/websocket.mdx)
+- [Notification events](/wallet/websocket-events.mdx)
+
+## Pro Trading
+
+- [Overview](/pro/overview.mdx)
+- [First order](/pro/first-order.mdx)
+- [Pro WebSocket](/pro/websocket.mdx)
+- Samples: https://github.com/bit2me-devs/trading-spot-samples
+
+## Partner
+
+- [KYC](/partner/kyc.mdx)
+- [KYB](/partner/kyb.mdx)
+- [Apple Pay / Google Pay](/partner/apple-google-pay.mdx)
+- [Address book withdrawals](/partner/withdrawals-address-book.mdx)
+- [Wallet legacy withdrawals](/partner/withdrawals-wallet.mdx)
+- [Social Pay vs pocket transfer](/partner/transfers.mdx)
+
+## AI
+
+- [MCP overview](/ai/overview.mdx)
+- [Tool catalog](/ai/tools.mdx)
+- Package: @bit2me/mcp-server (no external withdrawals)

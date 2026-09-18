@@ -1,0 +1,10 @@
+.env
+.env.*
+node_modules/
+.mintlify/
+.mintlify-home/
+.tools/
+*.log
+.DS_Store
+
+# keep raw dumps tracked; mint ignore is .mintignore

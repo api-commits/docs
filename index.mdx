@@ -1,133 +1,49 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
-icon: 'star'
+title: "Bit2Me API"
+description: "Build on Bit2Me — wallet, Pro trading, partner onboarding, and MCP."
+keywords: ["Bit2Me API", "crypto API", "HMAC", "subaccount"]
 ---
 
-## Setting up
-
-Get your documentation site up and running in minutes.
-
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
+Welcome to the Bit2Me developer portal. Choose the path that matches what you are building.
 
 <Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+  <Card title="Wallet API" icon="wallet" href="/quickstart">
+    Custody, pockets, buy and sell, Earn, and loans on the gateway REST API.
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="Pro Trading" icon="chart-line" href="/pro/overview">
+    Spot market data, orders, balances, and WebSocket channels.
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Partner" icon="building" href="/partner/overview">
+    B2B2C: KYC, KYB, widgets, fiat funding, and crypto withdrawals.
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="AI and MCP" icon="robot" href="/ai/overview">
+    Connect Claude or Cursor to Bit2Me with the official MCP server.
   </Card>
 </Columns>
 
-## Create beautiful pages
+## Start here
 
-Everything you need to create world-class documentation.
+<Steps>
+  <Step title="Create API keys">
+    Generate keys in the [Bit2Me API dashboard](https://account.bit2me.com/api-keys). Use the smallest scope you need (Read, Trade, Withdraw) and restrict by IP when you can.
+  </Step>
+  <Step title="Sign your first request">
+    Private endpoints use HMAC. Follow [Authentication](/guides/authentication) and send `x-api-key`, `api-signature`, and `x-nonce`.
+  </Step>
+  <Step title="Pick a product">
+    Wallet buy/sell, Pro orders, or partner onboarding. The REST tabs are generated from the public OpenAPI specs.
+  </Step>
+</Steps>
 
 <Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
+  <Card title="Platform status" icon="activity" href="https://status.bit2me.com">
+    Check Auth, Wallet, and Pro on status.bit2me.com before you open a ticket.
   </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
+  <Card title="Support" icon="life-ring" href="https://support.bit2me.com">
+    Help center and ticket form for API issues.
   </Card>
 </Columns>
 
-## Make your content agent ready
-
-Make your docs work for humans and AI agents alike.
-
-<Columns cols={2}>
-  <Card
-    title="Prompt component"
-    icon="robot"
-    href="/agent-ready/prompt"
-  >
-    Embed shareable AI prompts readers can copy or open in Cursor.
-  </Card>
-  <Card
-    title="Visibility"
-    icon="eye"
-    href="/agent-ready/visibility"
-  >
-    Show different content to humans and agents reading your docs.
-  </Card>
-  <Card
-    title="Contextual menu"
-    icon="bolt"
-    href="/agent-ready/contextual"
-  >
-    Give readers one-click access to Claude, ChatGPT, Cursor, and more.
-  </Card>
-  <Card
-    title="AI coding tools"
-    icon="wand-magic-sparkles"
-    href="/ai-tools/claude-code"
-  >
-    Set up Claude Code, Cursor, or Windsurf with Mintlify's skill.
-  </Card>
-</Columns>
-
-## Need inspiration?
-
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+<Note>
+This site runs in parallel with the current Scalar reference at [api.bit2me.com/doc](https://api.bit2me.com/doc). Until cutover, treat both as complementary. Do not invent endpoints that are not in the OpenAPI snapshot.
+</Note>

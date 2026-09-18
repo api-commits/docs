@@ -1,0 +1,32 @@
+---
+title: "Public channels"
+description: "Order book Level 2 and public trades — no authentication."
+---
+
+Connect to `wss://ws.bit2me.com/v1/trading`.
+
+## Order book
+
+```json
+{
+  "event": "subscribe",
+  "symbol": "B2M/EUR",
+  "subscription": { "name": "order-book" }
+}
+```
+
+Unsubscribe with `"event": "unsubscribe"` and the same `subscription`. Sample: [get-order-book](https://github.com/bit2me-devs/trading-spot-samples/tree/main/node/ws/public/get-order-book).
+
+## Public trades
+
+```json
+{
+  "event": "subscribe",
+  "symbol": "B2M/EUR",
+  "subscription": { "name": "public-trades" }
+}
+```
+
+Sample: [get-last-trades](https://github.com/bit2me-devs/trading-spot-samples/tree/main/node/ws/public/get-last-trades).
+
+Messages include `event`, `symbol`, and `data` (bids/asks + `nonce` for the book; `side`, `price`, `amount`, `timestamp` for trades).

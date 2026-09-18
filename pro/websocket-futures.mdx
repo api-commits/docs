@@ -1,0 +1,32 @@
+---
+title: "Futures WebSocket"
+description: "Limited availability — perpetual public channels until product confirms a full launch."
+---
+
+<Warning>
+Futures WebSocket is documented from the public spec as **limited availability**. Do not treat this as a generally available product until Bit2Me product and legal confirm it for your account.
+</Warning>
+
+URL: **`wss://ws.bit2me.com/v1/futures/connection/websocket`**.
+
+Token via `POST /v1/signin/apikey` — valid **1 minute**. Authenticate by sending a JSON object with `token`. Rejected connections may return HTTP-style `error.code` `401` and `error.message` `unauthorized`.
+
+Example symbols from the spec: `BTCUSDC_PERP`, `ETHUSDC_PERP`.
+
+Public subscribe (no auth):
+
+```json
+{ "channel": "ticker:BTCUSDC_PERP" }
+```
+
+```json
+{ "channel": "orderbook:BTCUSDC_PERP" }
+```
+
+```json
+{ "channel": "market-trades:BTCUSDC_PERP" }
+```
+
+Unsubscribe by sending the same object with `"unsubscribe": true`.
+
+Do not invent additional private futures commands, funding intervals, or SLAs beyond this spec excerpt.

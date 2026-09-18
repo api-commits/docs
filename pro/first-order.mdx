@@ -1,0 +1,51 @@
+---
+title: "First order in minutes"
+description: "Place a signed Pro spot order with a known HMAC fixture."
+---
+
+<Info>
+Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com).
+</Info>
+
+<Steps>
+  <Step title="Create a Trade-scoped key">
+    Open [Get API keys](https://account.bit2me.com/api-keys). Restrict by IP when you can.
+  </Step>
+  <Step title="Verify your signer">
+    Run the [known-answer fixture](/guides/authentication) before you hit production.
+  </Step>
+  <Step title="List markets">
+    ```http
+    GET /v1/trading/market-config
+    ```
+    Public. Use the returned symbol, min/max, and precision. Sample: [get-markets](https://github.com/bit2me-devs/trading-spot-samples/tree/main/node/rest/market-data/get-markets).
+  </Step>
+  <Step title="Check ticker or book">
+    `GET /v2/trading/tickers` and `GET /v2/trading/order-book`. Still public.
+  </Step>
+  <Step title="Place the order">
+    ```http
+    POST /v1/trading/order
+    ```
+    Example body (sign `nonce:path:JSON.stringify(body)`):
+
+    ```json
+    {
+      "side": "buy",
+      "symbol": "BTC/EUR",
+      "price": "50000",
+      "amount": "0.01",
+      "orderType": "limit"
+    }
+    ```
+
+    Sample: [trading-spot-samples REST trading](https://github.com/bit2me-devs/trading-spot-samples/tree/main/node/rest/trading).
+  </Step>
+  <Step title="Confirm">
+    `GET /v1/trading/order/{id}` or subscribe to `my-orders` on the [Pro WebSocket](/pro/websocket).
+  </Step>
+</Steps>
+
+Amounts are strings. Use `.` for decimals. HTTP **412** insufficient funds; **417** amount outside market limits.
+
+Optional: stream fills on `wss://ws.bit2me.com/v1/trading` after [WsAuth](/pro/websocket).

@@ -1,126 +1,372 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mintlify Starter Kit",
+  "theme": "aspen",
+  "name": "Bit2Me API",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#0046E1",
+    "light": "#99AFFF",
+    "dark": "#001A33"
   },
-  "favicon": "/favicon.svg",
-  "navigation": {
-    "tabs": [
-      {
-        "tab": "Guides",
-        "groups": [
-          {
-            "group": "Getting started",
-            "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/components",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "Agent ready",
-            "pages": [
-              "agent-ready/prompt",
-              "agent-ready/visibility",
-              "agent-ready/contextual",
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API reference",
-        "groups": [
-          {
-            "group": "API documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
-          },
-          {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
-          }
-        ]
-      }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
+  "fonts": {
+    "family": "Manrope",
+    "heading": {
+      "family": "Rubik",
+      "weight": 700
+    },
+    "body": {
+      "family": "Manrope",
+      "weight": 400
     }
   },
+  "favicon": "/favicon.svg",
   "logo": {
     "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "dark": "/logo/dark.svg",
+    "href": "https://bit2me.com"
+  },
+  "appearance": {
+    "default": "system"
+  },
+  "background": {
+    "decoration": "gradient",
+    "color": {
+      "light": "#FFFFFF",
+      "dark": "#001A33"
+    }
   },
   "navbar": {
     "links": [
       {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "https://support.bit2me.com"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "label": "Get API keys",
+      "href": "https://account.bit2me.com/api-keys"
     }
-  },
-  "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
-    }
+      "x": "https://x.com/bit2me",
+      "linkedin": "https://linkedin.com/company/bit2me",
+      "youtube": "https://www.youtube.com/@Bit2MeOfficial"
+    },
+    "links": [
+      {
+        "header": "Operations",
+        "items": [
+          {
+            "label": "API status",
+            "href": "https://status.bit2me.com"
+          },
+          {
+            "label": "Current API reference (Scalar)",
+            "href": "https://api.bit2me.com/doc"
+          }
+        ]
+      },
+      {
+        "header": "Help",
+        "items": [
+          {
+            "label": "Help center",
+            "href": "https://support.bit2me.com"
+          },
+          {
+            "label": "Submit a ticket",
+            "href": "https://support.bit2me.com"
+          }
+        ]
+      },
+      {
+        "header": "Company",
+        "items": [
+          {
+            "label": "Bit2Me",
+            "href": "https://bit2me.com"
+          },
+          {
+            "label": "Brand resources",
+            "href": "https://bit2me.com/press"
+          }
+        ]
+      }
+    ]
+  },
+  "api": {
+    "openapi": [
+      "openapi/crypto.json",
+      "openapi/trading-spot-rest.json",
+      "openapi/embed.json"
+    ],
+    "playground": {
+      "display": "simple"
+    },
+    "examples": {
+      "languages": [
+        "bash",
+        "node",
+        "python"
+      ],
+      "defaults": "required"
+    },
+    "mdx": {
+      "server": "https://gateway.bit2me.com"
+    },
+    "asyncapi": "asyncapi/trading.yaml"
+  },
+  "navigation": {
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Status",
+          "href": "https://status.bit2me.com",
+          "icon": "activity"
+        },
+        {
+          "anchor": "Support",
+          "href": "https://support.bit2me.com",
+          "icon": "life-ring"
+        }
+      ]
+    },
+    "products": [
+      {
+        "product": "Wallet API",
+        "description": "Custody, buy, sell, earn, and loans",
+        "icon": "wallet",
+        "tabs": [
+          {
+            "tab": "Guides",
+            "groups": [
+              {
+                "group": "Get started",
+                "pages": [
+                  "index",
+                  "quickstart",
+                  "guides/account-model",
+                  "guides/authentication",
+                  "guides/rate-limits",
+                  "guides/errors"
+                ]
+              },
+              {
+                "group": "Wallet",
+                "pages": [
+                  "wallet/pockets",
+                  "wallet/buy-sell",
+                  "wallet/earn",
+                  "wallet/loans",
+                  "wallet/money-flow"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "REST",
+            "groups": [
+              {
+                "group": "Using the reference",
+                "pages": [
+                  "wallet/rest-overview"
+                ]
+              },
+              {
+                "group": "Wallet API",
+                "openapi": "openapi/crypto.json"
+              }
+            ]
+          },
+          {
+            "tab": "Notifications",
+            "groups": [
+              {
+                "group": "Gateway WebSocket",
+                "pages": [
+                  "wallet/websocket",
+                  "wallet/websocket-events"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "product": "Pro Trading",
+        "description": "Spot REST and WebSocket trading",
+        "icon": "chart-line",
+        "tabs": [
+          {
+            "tab": "Guides",
+            "groups": [
+              {
+                "group": "Get started",
+                "pages": [
+                  "pro/overview",
+                  "pro/first-order",
+                  "guides/authentication",
+                  "guides/rate-limits"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "REST",
+            "groups": [
+              {
+                "group": "Using the reference",
+                "pages": [
+                  "pro/rest-overview"
+                ]
+              },
+              {
+                "group": "Pro Trading REST",
+                "openapi": "openapi/trading-spot-rest.json"
+              }
+            ]
+          },
+          {
+            "tab": "WebSockets",
+            "groups": [
+              {
+                "group": "Spot",
+                "pages": [
+                  "pro/websocket",
+                  "pro/websocket-public",
+                  "pro/websocket-private"
+                ]
+              },
+              {
+                "group": "Spot channels",
+                "asyncapi": "asyncapi/trading.yaml"
+              },
+              {
+                "group": "Futures",
+                "pages": [
+                  "pro/websocket-futures"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "product": "Partner",
+        "description": "B2B2C onboarding, funding, and withdrawals",
+        "icon": "building",
+        "tabs": [
+          {
+            "tab": "Guides",
+            "groups": [
+              {
+                "group": "Architecture",
+                "pages": [
+                  "partner/overview",
+                  "partner/architecture"
+                ]
+              },
+              {
+                "group": "Onboarding",
+                "pages": [
+                  "partner/kyc",
+                  "partner/kyb"
+                ]
+              },
+              {
+                "group": "Money movement",
+                "pages": [
+                  "partner/fiat",
+                  "partner/apple-google-pay",
+                  "partner/withdrawals-address-book",
+                  "partner/withdrawals-wallet",
+                  "partner/transfers"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "REST",
+            "groups": [
+              {
+                "group": "Using the reference",
+                "pages": [
+                  "partner/rest-overview"
+                ]
+              },
+              {
+                "group": "Embed",
+                "openapi": "openapi/embed.json"
+              }
+            ]
+          },
+          {
+            "tab": "Widgets",
+            "groups": [
+              {
+                "group": "Embed",
+                "pages": [
+                  "partner/widgets",
+                  "partner/embed-identity",
+                  "partner/embed-add-card"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "product": "AI",
+        "description": "MCP server, recipes, and agent files",
+        "icon": "robot",
+        "tabs": [
+          {
+            "tab": "MCP",
+            "groups": [
+              {
+                "group": "Setup",
+                "pages": [
+                  "ai/overview",
+                  "ai/cursor",
+                  "ai/claude",
+                  "ai/tools",
+                  "ai/errors"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Recipes",
+            "groups": [
+              {
+                "group": "Common tasks",
+                "pages": [
+                  "recipes/hmac-401",
+                  "recipes/subaccount-header",
+                  "recipes/withdrawals",
+                  "recipes/apple-pay",
+                  "recipes/social-pay",
+                  "recipes/rate-limit",
+                  "recipes/totp",
+                  "recipes/websocket-vs-polling"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   }
 }

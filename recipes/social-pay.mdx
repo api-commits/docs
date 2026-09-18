@@ -1,0 +1,10 @@
+---
+title: "Social Pay is not a pocket transfer"
+description: "Escrow and claim vs destination.pocket."
+---
+
+`operation: social-payment` creates a **Pay** order. Funds can wait in escrow until claim, auto-claim, or expiry refund. That is not an instant treasury post to a pocket.
+
+For known pocket UUIDs, use `destination.pocket` instead. See [Social Pay vs pocket transfer](/partner/transfers).
+
+Do not invent a silent master–sub product or an email-off switch.

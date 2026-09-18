@@ -1,0 +1,41 @@
+---
+title: "Social Pay vs pocket transfer"
+description: "Two different rails. Do not treat Social Pay as silent institutional treasury."
+---
+
+<Info>
+Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com).
+</Info>
+
+| Rail | How you call it | Behavior |
+| --- | --- | --- |
+| **Social payment** | Proforma `operation: social-payment` plus `destination.email`, `phone`, or `alias` → execute | Creates a Pay order. Funds can sit in **escrow** until claim, auto-claim, or expiry refund. Retail email UX applies. |
+| **Pocket transfer** | Proforma with `destination.pocket` | Wallet movement between known pocket IDs. Does **not** go through the Pay escrow rail. |
+
+## Social Pay
+
+Execute with `POST /v1/wallet/transaction`. A successful execute returns a Pay order (`orderId`, `status: pending`, `expiryDate`, `walletMovementId`) — not an instant pocket credit.
+
+List pending: `GET /v1/social-pay/order`.
+
+Claim with a chosen pocket:
+
+```http
+POST /v1/social-pay/order/claim
+```
+
+Body is an array of objects with `orderId` and `pocketId`. Destination pocket **cannot** be selected at create — only at claim (or via auto-claim to the first suitable pocket).
+
+WebSocket types: `social.payment.pending`, `social.payment.success`, `social.payment.expiration`.
+
+## Pocket transfer
+
+When both pocket UUIDs are known, `destination.pocket` is the closer API treasury move. Confirm end-to-end for parent ↔ subaccount in your environment before you promise both directions.
+
+## What not to invent
+
+- A unified “master-sub treasury product”
+- A documented API flag to disable claim emails
+- Auto-delivery guarantees for every company parent
+
+If you need silent institutional moves, prefer pocket transfer and confirm with your integration manager.

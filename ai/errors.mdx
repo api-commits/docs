@@ -1,0 +1,22 @@
+---
+title: "MCP errors"
+description: "401, nonce, 429, 400, and funds errors when using the MCP server."
+---
+
+<Info>
+Check [status.bit2me.com](https://status.bit2me.com) before opening a ticket. If this persists, [open a support ticket](https://support.bit2me.com).
+</Info>
+
+| Symptom | What to do |
+| --- | --- |
+| **401** Unauthorized | Trim spaces in `.env`. Confirm Wallets / Trading (and Earn / Loans if you use those tools). Copy the full key and secret. |
+| Invalid signature / nonce | Sync the clock with NTP. HMAC window is 5 seconds. |
+| **429** | Back off. `portfolio_get_valuation` fans out to multiple HTTP calls. Wait before retry. |
+| ECONNRESET / timeout | Network or platform issue. Retry. Check status. |
+| Insufficient funds | `wallet_get_pockets` first. Include fees. |
+| Symbol not found | MCP pairs are `BASE-QUOTE` (`BTC-EUR`). Use `broker_get_asset_data` or `general_get_assets_config`. |
+| **400** | Types and required fields. Amounts are **strings** with `.` decimals. |
+| Invalid amount | `pro_get_market_config` for min/max. |
+| **500 / 502** | Retry later; check status. |
+
+Full FAQ: [mcp.bit2me.com](https://mcp.bit2me.com/).

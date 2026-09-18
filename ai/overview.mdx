@@ -1,0 +1,28 @@
+---
+title: "Bit2Me MCP"
+description: "Local MCP server: 48 tools for Wallet, Pro, Earn, Loans, and portfolio."
+---
+
+The official server is [`@bit2me/mcp-server`](https://www.npmjs.com/package/@bit2me/mcp-server). Full product page: [mcp.bit2me.com](https://mcp.bit2me.com). Source: [bit2me-devs/bit2me-mcp](https://github.com/bit2me-devs/bit2me-mcp).
+
+It runs **on your machine**. API keys never leave your computer. A remote MCP option is described as coming later on the MCP site — not available here.
+
+## What you can do
+
+48 tools: General (4), Broker (8), Wallet (4), Pro (14), Earn (11), Loans (7). See the [tool catalog](/ai/tools).
+
+**Not supported:** withdrawals to external blockchain addresses or transfers to other users. Do not enable Withdraw on the MCP key. Wallet ↔ Pro ↔ Earn internal moves are supported.
+
+## Auth
+
+Set `BIT2ME_API_KEY` and `BIT2ME_API_SECRET`. HMAC is handled by the server. Recommended dashboard permissions: Wallets, Trading, Earn, Loans.
+
+Get keys: [account.bit2me.com/api-keys](https://account.bit2me.com/api-keys) (MCP README also mentions the in-app API dashboard).
+
+## Agents
+
+Point coding agents at this docs repo: [`llms.txt`](/llms.txt) and [`AGENTS.md`](/AGENTS.md). Treat `openapi/*.json` as the REST source of truth — do not invent paths.
+
+<Info>
+Check [status.bit2me.com](https://status.bit2me.com) before opening a ticket. If this persists, [open a support ticket](https://support.bit2me.com).
+</Info>

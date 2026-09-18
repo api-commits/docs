@@ -1,0 +1,15 @@
+---
+title: "Partner REST overview"
+description: "Embed snapshot plus the Wallet/Funding routes partners actually call."
+---
+
+The Partner **REST** tab highlights Embed (`openapi/embed.json`: subaccount, signin, account, B2M authorize/report). Most partner money movement is on the [Wallet REST](/wallet/rest-overview) and Funding tags of `crypto.json`.
+
+| Area | Spec |
+| --- | --- |
+| Widgets / session | `openapi/embed.json` |
+| KYC, pockets, teller, withdrawals | `openapi/crypto.json` |
+
+Playground is **simple** because HMAC cannot be computed in the browser. Copy examples, sign on your backend.
+
+Until cutover: [api.bit2me.com/doc](https://api.bit2me.com/doc).

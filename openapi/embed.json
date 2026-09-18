@@ -1,0 +1,5014 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Bit2Me API Embed",
+    "description": "# Introduction\nEmbed is a full working web service to help you integrate the Crypto API quickly and economically into your current application flow.\n\n<figure>\n\n  ![Sample UI resource](images/wallet-balance.svg)\n\n  <figcaption><b>Fig. - Sample UI resource</b></figcaption>\n</figure>\n\n<figure>\n\n  ![Embed with default theme](images/token-list.svg)\n  ![Embed with custom theme (purple)](images/token-list-custom.svg)\n\n  <figcaption><b>Fig. - Embed with custom theme (purple)</b></figcaption>\n</figure>\n"
+  },
+  "servers": [
+    {
+      "url": "https://gateway.bit2me.com",
+      "description": "Production"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Customization",
+      "description": "Embed solution allows slight customization. In order to make this customization we need you to provide some information collected in the following document\n<div class=\"box-info-wrapper\">\n  <p class=\"link-wrapper\">\n    <a href=\"files/embed-customization-requirements.pdf\" target=\"_blank\">\n      Download embed customization requirements\n    </a>\n    <i class=\"material-symbols-outlined\">\n      north_east\n    </i>\n  </p>\n</div>\n"
+    },
+    {
+      "name": "Auth flow",
+      "description": "<figure>\n\n  ![Embed auth flow diagram](images/embed-diagram.png)\n\n  <figcaption><b>Fig. - Embed auth flow diagram</b></figcaption>\n</figure>\n\n## 1. The end user request access to the embed\nThe end user opens your frontend and opens the embed in a webview. It must be logged in to load the view. Otherwise nothing will be visible (in Fig).\n<figure>\n\n  ![Dashboard view](images/initial-view.svg)\n\n  <figcaption><b>Fig. - Dashboard view</b></figcaption>\n</figure>\n"
+    },
+    {
+      "name": "Card pay ins (Optional feature)",
+      "description": "If needed, embed provides the capability to register user card. The authentication for the subaccount must be obtained [**as explained in Step 3 of Auth Flow**](#tag/Auth-flow/operation/signinEmbed)) before loading the url that manages this functionality. <br> <br> Then, the only thing needed is to load a webview depending on the environment on the following urls and inject the token queryParam.\n\n<div class=\"box-info-wrapper\">\n  <div class=\"box-info-title\">\n    <i class=\"material-symbols-outlined\">info</i>\n    <h6>Production</h6>\n  </div>\n  <br>\n  <h6 class=\"embed-link\">\n    https://embed.bit2me.com/add-card?t=token&lang=language\n  </h6>\n</div>\n<br> Queryparams supported:\n<div class=\"box-info-wrapper\">\n  <p class=\"queryparam-info\"><strong>t</strong>: the obtained token from step 3. (MANDATORY).</p>\n  <p class=\"queryparam-info\"><strong>lang</strong>: the language to be loaded. Must be one of ['en','es','pt']. Defaults to 'en' (OPTIONAL).</p>\n</div>\n"
+    },
+    {
+      "name": "User flow",
+      "description": "## 1. Buy, Sell and Swap\n<figure>\n  <div class=\"iframe-wrapper\">\n    <iframe\n      class=\"figma-embed\"\n      height=\"450\"\n      width=\"100%\"\n      src=\"https://www.figma.com/embed?embed_host=bit2me.com&url=https://www.figma.com/file/yVf5hW8gAGbt4wN9fhHuJP/Untitled?node-id=0%3A1\"\n      allowfullscreen>\n    </iframe>\n  </div>\n\n  <p><p/>\n  <figcaption><b>Fig. - Buy, Sell and Swap flow diagram</b></figcaption>\n\n</figure>\n\n## 2. Earn [optional]\n<figure>\n  <div class=\"iframe-wrapper\">\n    <iframe\n      class=\"figma-embed\"\n      height=\"450\"\n      width=\"100%\"\n      src=\"https://www.figma.com/embed?embed_host=bit2me.com&url=https://www.figma.com/file/yVf5hW8gAGbt4wN9fhHuJP/User-flow?node-id=798%3A333\"\n      allowfullscreen>\n    </iframe>\n  </div>\n\n  <p><p/>\n  <figcaption><b>Fig. - Earn flow diagram</b></figcaption>\n\n</figure>\n\n## 3. KYC [optional]\n<figure>\n  <div class=\"iframe-wrapper\">\n    <iframe\n      class=\"figma-embed\"\n      height=\"450\"\n      width=\"100%\"\n      src=\"https://www.figma.com/embed?embed_host=bit2me.com&url=https://www.figma.com/file/yVf5hW8gAGbt4wN9fhHuJP/Crypto-API-User-flow?node-id=1202%3A1037\"\n      allowfullscreen>\n    </iframe>\n  </div>\n\n  <p><p/>\n  <figcaption><b>Fig. - KYC flow diagram</b></figcaption>\n\n</figure>\n"
+    },
+    {
+      "name": "Embed development activities",
+      "description": "Apart from integrating the embed (activities in [**steps 1 through 6**](#tag/Flow-steps)), your company needs to provide Bit2Me with some information in order to properly deploy the embed.\n\n- We need you to create the next endpoints in your backend so Bit2me\n  can ask you for authorization on each operation and report\n  about transaction operations.\n"
+    }
+  ],
+  "paths": {
+    "/v1/account/subaccount": {
+      "post": {
+        "tags": [
+          "Auth flow"
+        ],
+        "summary": "2. Identify users's subaccount",
+        "description": "If the user does not have an subaccount in Bit2Me it is necessary to create one before continuing to operate.\n\nYour backend can create a subaccount for this specific user in Bit2Me using the [createSubaccount](/doc#tag/Account/operation/createSubaccount) endpoint.\n\nThe request body accepts a `type` field with values `person` or `company`, same as when creating a regular user account.\n\nThe Bit2Me backend will return the `userId` for this subaccount. This id links this subaccount with your client's account. **It is necessary to keep this relationship in your backend** to operate the Bit2Me subaccount in the future.\n\nIf the user already has a subaccount, you don't need to create it again. But you will need to send it in the following steps.\n",
+        "operationId": "createSubaccount",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "name",
+                  "surname",
+                  "phone"
+                ],
+                "properties": {
+                  "email": {
+                    "$ref": "#/components/schemas/EmailParam"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "surname": {
+                    "type": "string"
+                  },
+                  "phone": {
+                    "$ref": "#/components/schemas/PhoneParam"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "person",
+                      "company"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "description": "The details to create the subaccount",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "userId"
+                  ],
+                  "properties": {
+                    "userId": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "Shell",
+            "label": "cURL",
+            "source": "# Create subaccount\ncurl -X POST ${SERVER_URL}/v1/account/subaccount\n  -H 'Content-type: application/json'\n  -H 'X-API-KEY: <api key>'\n  -d '{\n    \"email\": \"<user email>\",\n    \"name\": \"<user name>\",\n    \"surname\": \"<user surname>\",\n    \"phone\": {\n      \"number\": \"<phoneNumber>\",\n      \"countryCode\": \"<countryCode>\",\n    },\n    \"type\": \"person\"\n  }'\n"
+          }
+        ]
+      }
+    },
+    "/v1/signin/apikey": {
+      "post": {
+        "tags": [
+          "Auth flow"
+        ],
+        "summary": "3. Obtain token for subaccount",
+        "description": "You must ask Bit2Me backend for a token for that specific subaccount.\n<div class=\"box-info-wrapper\">\n  <div class=\"box-info-title\">\n    <i class=\"material-symbols-outlined\">info</i>\n    <h6>For more information.</h6>\n  </div>\n\n  <p class=\"link-wrapper\">\n    <a href=\"/doc#tag/Access/operation/signInApiKey\" target=\"_blank\">\n      Go to API signinApiKey endpoint documentation\n    </a>\n    <i class=\"material-symbols-outlined\">\n      north_east\n    </i>\n  </p>\n</div>\n",
+        "operationId": "signinEmbed",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "$ref": "#/components/schemas/UserIdParam"
+                  }
+                }
+              }
+            }
+          },
+          "description": "The data to sigin"
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "accessToken"
+                  ],
+                  "properties": {
+                    "accessToken": {
+                      "$ref": "#/components/schemas/TokenResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "Js",
+            "label": "Node",
+            "source": "const axios = require('axios');\nconst crypto = require('crypto');\n\nconst API_KEY = 'YOUR_API_KEY';\nconst SECRET = 'YOUR_API_SECRET';\n\nconst NONCE = Date.now();\nconst PATH = '/v1/signin/apikey';\nconst SERVER = 'https://gateway.bit2me.com';\n\nconst getAuthHeaders = (nonce, path, body) => {\n  const messageToSign = getClientMessageToSign(nonce, path, body);\n  const signature = getMessageSignature(messageToSign, SECRET);\n\n  return {\n    headers: {\n      'x-api-key': API_KEY,\n      'api-signature': signature,\n      'x-nonce': nonce\n    }\n  };\n};\n\nconst getClientMessageToSign = (nonce, url, body) => {\n  const hasBody = !!body;\n\n  return hasBody\n    ? `${nonce}:${url}:${JSON.stringify(body)}`\n    : `${nonce}:${url}`;\n};\n\nconst getMessageSignature = (message, secret) => {\n  const hash = crypto.createHash('sha256');\n  const hmac = crypto.createHmac('sha512', secret);\n  const hashDigest = hash.update(message).digest('binary');\n  const hmacDigest = hmac.update(hashDigest, 'binary').digest('base64');\n\n  return hmacDigest;\n};\n\nconst config = getAuthHeaders(NONCE, PATH, {});\naxios.post(`${SERVER}${PATH}`, {}, config).then(response=>console.log(response.data));\n"
+          },
+          {
+            "lang": "Shell",
+            "label": "cURL",
+            "source": "# Get authorized token by apikey\ncurl -X POST ${SERVER_URL}/v1/signin/apikey\n  -H 'Content-type: application/json'\n  -H 'X-API-KEY: <api key>'\n  -H 'api-signature: <sign message>'\n  -H 'x-nonce: <nonce>'\n"
+          }
+        ]
+      }
+    },
+    "/v1/account": {
+      "get": {
+        "tags": [
+          "Auth flow"
+        ],
+        "summary": "4. Inject token into the Bit2Me Embed",
+        "description": "Using the token you received from our backend, inject it into our embed by queryParam.\n\n<div class=\"box-info-wrapper\">\n  <div class=\"box-info-title\">\n    <i class=\"material-symbols-outlined\">info</i>\n    <h6>Production</h6>\n  </div>\n  <br>\n  <h6 class=\"embed-link\">\n    https://embed.bit2me.com/dashboard?t=token&lang=language\n  </h6>\n</div>\n<br> Queryparams supported:\n<div class=\"box-info-wrapper\">\n  <p class=\"queryparam-info\"><strong>t</strong>: the obtained token from step 3. (MANDATORY).</p>\n  <p class=\"queryparam-info\"><strong>lang</strong>: the language to be loaded. Must be one of ['en','es','pt']. Defaults to 'en' (OPTIONAL).</p>\n</div>\n"
+      }
+    },
+    "/v1/account/operate": {
+      "get": {
+        "tags": [
+          "Auth flow"
+        ],
+        "summary": "6. Operate",
+        "description": "Your users can now buy, sell, swap and earn cryptos.\n"
+      }
+    },
+    "/v1/b2m/transaction/authorize": {
+      "servers": [
+        {
+          "url": "https://your-api-domain.co"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Embed development activities"
+        ],
+        "summary": "Authorize Transaction",
+        "description": "Endpoint in your backend used by Bit2Me for request authorization on each transaction.\n",
+        "operationId": "authorizeTransaction",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerRequestTransaction"
+              }
+            }
+          },
+          "description": "The Bit2Me requested transaction data",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "authResponseId",
+                    "authorized"
+                  ],
+                  "properties": {
+                    "authResponseId": {
+                      "$ref": "#/components/schemas/IdParam"
+                    },
+                    "authorized": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/b2m/transaction/report": {
+      "servers": [
+        {
+          "url": "https://your-api-domain.co"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Embed development activities"
+        ],
+        "summary": "Report Transaction",
+        "description": "Endpoint in your backend used by Bit2Me to report transaction operations.\n",
+        "operationId": "reportTransaction",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomerRequestTransaction"
+              }
+            }
+          },
+          "description": "The Bit2Me reported transaction data",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "ExplorerCryptoParamInQuery": {
+        "name": "crypto",
+        "in": "query",
+        "description": "The crypto service",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "BTCTEST",
+            "BTC"
+          ]
+        }
+      },
+      "ExplorerCryptoParamInPath": {
+        "name": "crypto",
+        "in": "path",
+        "required": true,
+        "description": "The crypto service",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "BTCTEST",
+            "BTC"
+          ]
+        }
+      },
+      "ExplorerBlockHashParam": {
+        "name": "hash",
+        "in": "path",
+        "required": true,
+        "description": "The block hash",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "ExplorerBlockHeightParam": {
+        "name": "height",
+        "in": "path",
+        "required": true,
+        "description": "The block height",
+        "schema": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "ExplorerTransactionHashParam": {
+        "name": "hash",
+        "in": "path",
+        "required": true,
+        "description": "The transaction hash",
+        "schema": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "ExplorerAddressParam": {
+        "name": "addr",
+        "in": "path",
+        "required": true,
+        "description": "The address id",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ExplorerMultipleAddressParam": {
+        "name": "addr",
+        "in": "path",
+        "required": true,
+        "description": "The address id (use a comma delimited list to use multiple addresses)",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ExplorerRawParam": {
+        "name": "raw",
+        "in": "query",
+        "schema": {
+          "type": "boolean"
+        }
+      },
+      "QuerySubtypeParam": {
+        "name": "subtype",
+        "in": "query",
+        "description": "Specify the transaction subtype to filter the entries to be returned (or comma delimited list of subtypes)",
+        "required": false,
+        "example": "purchase",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "purchase",
+            "sell",
+            "manual-send",
+            "automatic-send",
+            "manual-transfer",
+            "funding",
+            "receive",
+            "transfer",
+            "swap",
+            "reimbursement",
+            "earn",
+            "launchpad-purchase"
+          ]
+        }
+      },
+      "QueryMethodParam": {
+        "name": "method",
+        "in": "query",
+        "description": "Specify the transaction method to filter the entries to be returned (or comma delimited list of methods)",
+        "required": false,
+        "example": "pocket",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "pocket",
+            "blockchain",
+            "card",
+            "bank",
+            "bank-transfer",
+            "profit-share",
+            "promo-referral"
+          ]
+        }
+      }
+    },
+    "requestBodies": {
+      "executeCardDepositOrderData": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "orderId"
+              ],
+              "properties": {
+                "orderId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "required": true
+      },
+      "UserAddress": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "streetAddress",
+                "city",
+                "stateCode",
+                "zip",
+                "countryCode",
+                "nationalityCountryCode"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "userId": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "alias": {
+                  "type": "string",
+                  "maxLength": 50
+                },
+                "streetAddress": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "city": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "stateCode": {
+                  "type": "string",
+                  "description": "Value obtained from 'fips' (Federal Information Processing Standard  (https://en.wikipedia.org/wiki/Federal_Information_Processing_Standards)) field in /v1/misc/country/{countryISOCode}/region response.\n\n  Additional information of this endpoint is available in misc section\n"
+                },
+                "zip": {
+                  "type": "string",
+                  "maxLength": 255
+                },
+                "countryCode": {
+                  "$ref": "#/components/schemas/CountryISO3166-1Alpha2Param"
+                },
+                "isResidence": {
+                  "type": "boolean"
+                },
+                "isDefaultAddress": {
+                  "type": "boolean"
+                },
+                "nationalityCountryCode": {
+                  "$ref": "#/components/schemas/CountryISO3166-1Alpha2Param"
+                }
+              }
+            }
+          }
+        },
+        "description": "Address params",
+        "required": true
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "required": [
+          "message",
+          "error"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string"
+          },
+          "statusCode": {
+            "type": "number"
+          },
+          "reqId": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      },
+      "TRErrorResponse": {
+        "required": [
+          "errorCode",
+          "message",
+          "errorType",
+          "date"
+        ],
+        "properties": {
+          "errorCode": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "errorType": {
+            "type": "string",
+            "default": "GENERIC"
+          },
+          "date": {
+            "type": "date-time"
+          }
+        }
+      },
+      "AssetsResponseV2": {
+        "properties": {
+          "symbol": {
+            "type": "object",
+            "properties": {
+              "symbol": {
+                "type": "string",
+                "example": "string"
+              },
+              "name": {
+                "type": "string",
+                "example": "string"
+              },
+              "slug": {
+                "type": "string",
+                "example": "string"
+              },
+              "mainwebUri": {
+                "type": "string",
+                "example": "string"
+              },
+              "uriScheme": {
+                "type": "string",
+                "example": "string"
+              },
+              "hexColor": {
+                "type": "string",
+                "example": "string"
+              },
+              "assetType": {
+                "type": "string",
+                "example": "string"
+              },
+              "exponent": {
+                "type": "integer",
+                "example": 0
+              },
+              "unitPriceScale": {
+                "type": "integer",
+                "example": 0
+              },
+              "transactionUnitPriceScale": {
+                "type": "integer",
+                "example": 0
+              },
+              "addressRegex": {
+                "type": "string",
+                "example": "string"
+              },
+              "hasImage": {
+                "type": "boolean",
+                "example": true
+              },
+              "hasPaymentRequest": {
+                "type": "boolean",
+                "example": true
+              },
+              "isERC20Token": {
+                "type": "boolean",
+                "example": true
+              },
+              "enabled": {
+                "type": "boolean",
+                "example": true
+              },
+              "lite": {
+                "type": "boolean",
+                "example": true
+              },
+              "exchange": {
+                "type": "string",
+                "example": "string"
+              },
+              "pairsWith": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "example": [
+                  "string"
+                ]
+              }
+            },
+            "required": [
+              "symbol",
+              "name",
+              "slug",
+              "mainwebUri",
+              "uriScheme",
+              "hexColor",
+              "assetType",
+              "exponent",
+              "unitPriceScale",
+              "transactionUnitPriceScale",
+              "addressRegex",
+              "hasImage",
+              "hasPaymentRequest",
+              "isERC20Token",
+              "enabled",
+              "lite",
+              "exchange",
+              "pairsWith"
+            ]
+          }
+        },
+        "required": [
+          "symbol"
+        ],
+        "example": {
+          "symbol": {
+            "symbol": "string",
+            "name": "string",
+            "slug": "string",
+            "mainwebUri": "string",
+            "uriScheme": "string",
+            "hexColor": "string",
+            "assetType": "string",
+            "exponent": 0,
+            "unitPriceScale": 0,
+            "transactionUnitPriceScale": 0,
+            "addressRegex": "string",
+            "hasImage": true,
+            "hasPaymentRequest": true,
+            "isERC20Token": true,
+            "enabled": true,
+            "lite": true,
+            "exchange": "string",
+            "pairsWith": [
+              "string"
+            ]
+          }
+        }
+      },
+      "AssetResponseV2": {
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "example": "string"
+          },
+          "name": {
+            "type": "string",
+            "example": "string"
+          },
+          "slug": {
+            "type": "string",
+            "example": "string"
+          },
+          "mainwebUri": {
+            "type": "string",
+            "example": "string"
+          },
+          "uriScheme": {
+            "type": "string",
+            "example": "string"
+          },
+          "hexColor": {
+            "type": "string",
+            "example": "string"
+          },
+          "assetType": {
+            "type": "string",
+            "example": "string"
+          },
+          "exponent": {
+            "type": "integer",
+            "example": 0
+          },
+          "unitPriceScale": {
+            "type": "integer",
+            "example": 0
+          },
+          "transactionUnitPriceScale": {
+            "type": "integer",
+            "example": 0
+          },
+          "addressRegex": {
+            "type": "string",
+            "example": "string"
+          },
+          "hasImage": {
+            "type": "boolean",
+            "example": true
+          },
+          "hasPaymentRequest": {
+            "type": "boolean",
+            "example": true
+          },
+          "isERC20Token": {
+            "type": "boolean",
+            "example": true
+          },
+          "enabled": {
+            "type": "boolean",
+            "example": true
+          },
+          "lite": {
+            "type": "boolean",
+            "example": true
+          },
+          "exchange": {
+            "type": "string",
+            "example": "string"
+          },
+          "pairsWith": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "symbol",
+          "name",
+          "slug",
+          "mainwebUri",
+          "uriScheme",
+          "hexColor",
+          "assetType",
+          "exponent",
+          "unitPriceScale",
+          "transactionUnitPriceScale",
+          "addressRegex",
+          "hasImage",
+          "hasPaymentRequest",
+          "isERC20Token",
+          "enabled",
+          "lite",
+          "exchange",
+          "pairsWith"
+        ],
+        "example": {
+          "symbol": "string",
+          "name": "string",
+          "slug": "string",
+          "mainwebUri": "string",
+          "uriScheme": "string",
+          "hexColor": "string",
+          "assetType": "string",
+          "exponent": 0,
+          "unitPriceScale": 0,
+          "transactionUnitPriceScale": 0,
+          "addressRegex": "string",
+          "hasImage": true,
+          "hasPaymentRequest": true,
+          "isERC20Token": true,
+          "enabled": true,
+          "lite": true,
+          "exchange": "string",
+          "pairsWith": [
+            "string"
+          ]
+        }
+      },
+      "EarnWalletResponse": {
+        "properties": {
+          "total": {
+            "type": "integer"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "walletId": {
+                  "type": "string"
+                },
+                "userId": {
+                  "type": "string"
+                },
+                "currency": {
+                  "type": "string"
+                },
+                "balance": {
+                  "type": "string"
+                },
+                "lockPeriod": {
+                  "type": "object",
+                  "properties": {
+                    "lockPeriodId": {
+                      "type": "string"
+                    },
+                    "months": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "convertedBalance": {
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "type": "string"
+                    },
+                    "currency": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                }
+              }
+            }
+          }
+        }
+      },
+      "EarnMovementResponse": {
+        "required": [
+          "total",
+          "data"
+        ],
+        "properties": {
+          "total": {
+            "type": "integer",
+            "description": "Number of returned entries"
+          },
+          "data": {
+            "type": "array",
+            "description": "Earn movements returned",
+            "items": {
+              "type": "object",
+              "required": [
+                "movementId",
+                "userId",
+                "type",
+                "createdAt",
+                "walletId",
+                "amount",
+                "source",
+                "issuer"
+              ],
+              "properties": {
+                "movementId": {
+                  "type": "string"
+                },
+                "userId": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "deposit"
+                  ]
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "walletId": {
+                  "type": "string"
+                },
+                "amount": {
+                  "type": "object",
+                  "required": [
+                    "value",
+                    "currency"
+                  ],
+                  "properties": {
+                    "value": {
+                      "type": "string"
+                    },
+                    "currency": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "rate": {
+                  "type": "object",
+                  "properties": {
+                    "amount": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "pair": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "convertedAmount": {
+                  "type": "object",
+                  "required": [
+                    "value",
+                    "currency"
+                  ],
+                  "properties": {
+                    "value": {
+                      "type": "string"
+                    },
+                    "currency": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "source": {
+                  "type": "object",
+                  "required": [
+                    "walletId",
+                    "currency"
+                  ],
+                  "properties": {
+                    "walletId": {
+                      "type": "string"
+                    },
+                    "currency": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "issuer": {
+                  "type": "object",
+                  "required": [
+                    "service",
+                    "id"
+                  ],
+                  "properties": {
+                    "service": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "EarnUserSummaryResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "currency",
+            "totalBalance",
+            "totalRewards"
+          ],
+          "properties": {
+            "currency": {
+              "type": "string"
+            },
+            "totalBalance": {
+              "type": "string"
+            },
+            "totalRewards": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "EarnMovementsSummaryByTypeResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "type",
+            "currency",
+            "total"
+          ],
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "currency": {
+              "type": "string"
+            },
+            "total": {
+              "type": "string"
+            },
+            "converted": {
+              "type": "object",
+              "properties": {
+                "amount": {
+                  "type": "string"
+                },
+                "currency": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "AssetsInfoResponse": {
+        "properties": {
+          "currency": {
+            "type": "string",
+            "description": "Currency symbol, it should be an allowed currency"
+          },
+          "disabled": {
+            "type": "boolean",
+            "description": "Currency status on earn"
+          },
+          "isNew": {
+            "type": "boolean",
+            "description": "Currency added on earn in the last 7 days"
+          },
+          "currenciesRewardAllowed": {
+            "description": "Currency rewards allowed with their info",
+            "type": "array",
+            "items": {
+              "properties": {
+                "currency": {
+                  "type": "string",
+                  "description": "Currency where can receive rewards"
+                },
+                "extraYield": {
+                  "type": "number",
+                  "description": "Extra Yield by currency applied in the reward"
+                },
+                "type": {
+                  "type": "string",
+                  "description": "Reward type",
+                  "enum": [
+                    "daily",
+                    "weekly",
+                    "monthly"
+                  ]
+                }
+              }
+            }
+          },
+          "levelExtraYieldType": {
+            "type": "string",
+            "enum": [
+              "space-pool",
+              "provided"
+            ]
+          }
+        }
+      },
+      "UserAddress": {
+        "type": "object",
+        "required": [
+          "streetAddress",
+          "city",
+          "stateCode",
+          "zip",
+          "countryCode"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "alias": {
+            "type": "string",
+            "maxLength": 50
+          },
+          "streetAddress": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "stateCode": {
+            "type": "string",
+            "description": "Value obtained from 'fips' (Federal Information Processing Standard  (https://en.wikipedia.org/wiki/Federal_Information_Processing_Standards)) field in /v1/misc/country/{countryISOCode}/region response.\n\n  Additional information of this endpoint is available in misc section\n"
+          },
+          "zip": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "countryCode": {
+            "$ref": "#/components/schemas/CountryISO3166-1Alpha2Param"
+          },
+          "isResidence": {
+            "type": "boolean"
+          },
+          "isDefaultAddress": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CryptoCurrencyParam": {
+        "type": "string"
+      },
+      "AddressParam": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 108,
+        "pattern": "^([0-9A-Za-z:_-]+\\.?){1,}$"
+      },
+      "NetworkParam": {
+        "type": "string",
+        "description": "The destination address network",
+        "example": "ethereum"
+      },
+      "PocketIdParam": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+      },
+      "CurrencyParam": {
+        "type": "string",
+        "description": "Valid currency symbol",
+        "example": "BTC"
+      },
+      "PocketNameParam": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 20
+      },
+      "PocketColorParam": {
+        "type": "integer",
+        "description": "Tag to categorize the pocket",
+        "example": 1,
+        "minimum": 0,
+        "maximum": 15
+      },
+      "AmountParam": {
+        "type": "string",
+        "pattern": "^[0-9]*\\.?[0-9]*$",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "SuccessResponse": {
+        "required": [
+          "result"
+        ],
+        "properties": {
+          "result": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ProformaIdParam": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+      },
+      "TransactionTextParam": {
+        "type": "string",
+        "maxLength": 100
+      },
+      "RateParam": {
+        "type": "object",
+        "properties": {
+          "rate": {
+            "type": "object",
+            "required": [
+              "value",
+              "pair"
+            ],
+            "properties": {
+              "value": {
+                "$ref": "#/components/schemas/AmountParam"
+              },
+              "pair": {
+                "type": "object",
+                "required": [
+                  "base",
+                  "quote"
+                ],
+                "properties": {
+                  "base": {
+                    "$ref": "#/components/schemas/CurrencyParam"
+                  },
+                  "quote": {
+                    "$ref": "#/components/schemas/CurrencyParam"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "ExtendedCurrencyParam": {
+        "type": "string"
+      },
+      "TransactionSubsFeeTypeParam": {
+        "description": "Indicates if the amount of the transaction is what the receiver will get or what will be deducted from the sender's balance:\n * SEA: Acronym for Send Exact Amount\n * REA: Acronym for Receive Exact Amount\n",
+        "type": "string",
+        "enum": [
+          "SEA",
+          "REA"
+        ]
+      },
+      "CreditCardOriginParam": {
+        "type": "object",
+        "required": [
+          "cardId"
+        ],
+        "properties": {
+          "cardId": {
+            "type": "string"
+          }
+        }
+      },
+      "BankAccountDestinationParam": {
+        "type": "object",
+        "required": [
+          "bankAccount",
+          "country"
+        ],
+        "properties": {
+          "bankAccount": {
+            "type": "string",
+            "maxLength": 36
+          },
+          "swiftBic": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "receiverName": {
+            "type": "string"
+          },
+          "bankName": {
+            "type": "string"
+          },
+          "bankAddress": {
+            "type": "string"
+          },
+          "bankCode": {
+            "type": "string"
+          },
+          "bankBranch": {
+            "type": "string"
+          }
+        }
+      },
+      "UserIdParam": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+      },
+      "EmailParam": {
+        "type": "string",
+        "format": "email",
+        "minLength": 6,
+        "maxLength": 96
+      },
+      "PasswordParam": {
+        "type": "string",
+        "minLength": 6,
+        "maxLength": 64,
+        "pattern": "^[^\\s]+$"
+      },
+      "SerialParam": {
+        "type": "string",
+        "maxLength": 14
+      },
+      "RecaptchaParam": {
+        "type": "string",
+        "minLength": 1
+      },
+      "PhoneParam": {
+        "type": "object",
+        "required": [
+          "number",
+          "countryCode"
+        ],
+        "properties": {
+          "number": {
+            "$ref": "#/components/schemas/PhoneNumberParam"
+          },
+          "countryCode": {
+            "$ref": "#/components/schemas/PhoneCountryCodeParam"
+          }
+        }
+      },
+      "AliasParam": {
+        "type": "string",
+        "pattern": "^[0-9a-z\\-_]{2,30}$"
+      },
+      "AmountCurrencyObject": {
+        "type": "object",
+        "required": [
+          "amount",
+          "currency"
+        ],
+        "properties": {
+          "amount": {
+            "$ref": "#/components/schemas/AmountParam"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/CurrencyParam"
+          },
+          "rate": {
+            "$ref": "#/components/schemas/RateParam"
+          }
+        }
+      },
+      "FeeParam": {
+        "type": "object",
+        "description": "Different fees for the transaction",
+        "properties": {
+          "network": {
+            "type": "object",
+            "description": "Network fee",
+            "required": [
+              "amount",
+              "currency"
+            ],
+            "properties": {
+              "amount": {
+                "$ref": "#/components/schemas/AmountParam"
+              },
+              "currency": {
+                "$ref": "#/components/schemas/AmountParam"
+              }
+            }
+          },
+          "flip": {
+            "type": "object",
+            "description": "Flip fee",
+            "required": [
+              "percentage",
+              "amount",
+              "currency"
+            ],
+            "properties": {
+              "percentage": {
+                "$ref": "#/components/schemas/AmountParam"
+              },
+              "amount": {
+                "$ref": "#/components/schemas/AmountParam"
+              },
+              "currency": {
+                "$ref": "#/components/schemas/CurrencyParam"
+              }
+            }
+          },
+          "teller": {
+            "type": "object",
+            "required": [
+              "fixed",
+              "variable"
+            ],
+            "properties": {
+              "fixed": {
+                "type": "object",
+                "required": [
+                  "amount",
+                  "currency"
+                ],
+                "properties": {
+                  "amount": {
+                    "$ref": "#/components/schemas/AmountParam"
+                  },
+                  "currency": {
+                    "$ref": "#/components/schemas/CurrencyParam"
+                  }
+                }
+              },
+              "variable": {
+                "type": "object",
+                "required": [
+                  "percentage",
+                  "amount",
+                  "currency"
+                ],
+                "properties": {
+                  "percentage": {
+                    "$ref": "#/components/schemas/AmountParam"
+                  },
+                  "amount": {
+                    "$ref": "#/components/schemas/AmountParam"
+                  },
+                  "currency": {
+                    "$ref": "#/components/schemas/CurrencyParam"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "UserAmount": {
+        "type": "object",
+        "required": [
+          "currency",
+          "amount"
+        ],
+        "properties": {
+          "currency": {
+            "$ref": "#/components/schemas/CurrencyParam"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/AmountParam"
+          }
+        }
+      },
+      "FiatAmount": {
+        "type": "object",
+        "required": [
+          "currency",
+          "amount"
+        ],
+        "properties": {
+          "currency": {
+            "type": "string",
+            "enum": [
+              "EUR",
+              "USD",
+              "..."
+            ],
+            "description": "The value currency code (ISO 4217)"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/AmountParam"
+          }
+        }
+      },
+      "FlipFeeParam": {
+        "type": "object",
+        "required": [
+          "percentage",
+          "amount",
+          "currency"
+        ],
+        "properties": {
+          "percentage": {
+            "$ref": "#/components/schemas/AmountParam"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/AmountParam"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/CurrencyParam"
+          }
+        }
+      },
+      "PhoneNumberParam": {
+        "type": "string",
+        "maxLength": 32,
+        "pattern": "^[0-9]+$"
+      },
+      "PhoneCountryCodeParam": {
+        "type": "string",
+        "pattern": "^[0-9]{1,4}$"
+      },
+      "AccountPurposeParam": {
+        "type": "string",
+        "enum": [
+          "savings",
+          "currencyExchange",
+          "investment",
+          "trading",
+          "cryptocurrencyPayments"
+        ]
+      },
+      "SecondFactorAuthParam": {
+        "type": "object",
+        "properties": {
+          "alwaysRequired": {
+            "type": "boolean"
+          }
+        }
+      },
+      "DocumentValidityParam": {
+        "type": "string",
+        "enum": [
+          "valid",
+          "almostExpired",
+          "expired",
+          "updateRequired"
+        ]
+      },
+      "SubStatusParam": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "waitingId",
+          "waitingUser"
+        ]
+      },
+      "VerifiedParam": {
+        "type": "array",
+        "description": "Verification steps already completed by the user. Additional internal values exist for staff accounts and are not part of the public flow.",
+        "items": {
+          "type": "string",
+          "enum": [
+            "email",
+            "phone",
+            "identity",
+            "questions",
+            "form"
+          ]
+        }
+      },
+      "KnowledgeLevelParam": {
+        "type": "number",
+        "minimum": 1,
+        "maximum": 4
+      },
+      "RegistrationReasonParam": {
+        "type": "string",
+        "enum": [
+          "investing",
+          "diversification",
+          "savings",
+          "curiosity",
+          "blockchain"
+        ]
+      },
+      "KnowledgeQuestionStatusParam": {
+        "type": "string",
+        "enum": [
+          "completed",
+          "uncompleted",
+          "omitted"
+        ]
+      },
+      "PersonParam": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "surname": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "male",
+              "female",
+              "N/D"
+            ]
+          },
+          "birthDate": {
+            "$ref": "#/components/schemas/DateISO8601Param"
+          },
+          "nationalityCountryCode": {
+            "$ref": "#/components/schemas/CountryISO3166-1Alpha2Param"
+          },
+          "employmentStatus": {
+            "$ref": "#/components/schemas/EmploymentStatus"
+          },
+          "profession": {
+            "type": "string"
+          },
+          "identity": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "idcard",
+                  "passport",
+                  "drivinglicense",
+                  "visa"
+                ]
+              },
+              "number": {
+                "type": "string",
+                "maxLength": 24,
+                "pattern": "^[0-9A-Z-. ]+$"
+              },
+              "expiryDate": {
+                "$ref": "#/components/schemas/DateISO8601Param"
+              },
+              "countryCode": {
+                "$ref": "#/components/schemas/CountryISO3166-1Alpha2Param"
+              }
+            }
+          }
+        }
+      },
+      "PersonWithoutIdentityParam": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "surname": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "male",
+              "female",
+              "N/D"
+            ]
+          },
+          "nationalityCountryCode": {
+            "$ref": "#/components/schemas/CountryISO3166-1Alpha2Param"
+          }
+        }
+      },
+      "ProfileParam": {
+        "type": "object",
+        "properties": {
+          "langCode": {
+            "$ref": "#/components/schemas/LangISO639-1Param"
+          },
+          "currencyCode": {
+            "$ref": "#/components/schemas/CurrencyISO4217Param"
+          },
+          "timeZone": {
+            "$ref": "#/components/schemas/TimeZoneIanaParam"
+          },
+          "avatar": {
+            "type": "object",
+            "properties": {
+              "sm": {
+                "type": "string"
+              },
+              "md": {
+                "type": "string"
+              },
+              "lg": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "DateISO8601Param": {
+        "type": "string",
+        "format": "date"
+      },
+      "DateTimeISO8601Param": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "LangISO639-1Param": {
+        "type": "string",
+        "pattern": "^[a-z]{2}(-[A-Z]{2})?$"
+      },
+      "CurrencyISO4217Param": {
+        "type": "string",
+        "pattern": "^[A-Z]{3}$"
+      },
+      "TimeZoneIanaParam": {
+        "type": "string",
+        "format": "^[A-Za-z_\\-\\\\]+$",
+        "maxLength": 50
+      },
+      "UserAddressParam": {
+        "type": "object",
+        "required": [
+          "country",
+          "state",
+          "city",
+          "street",
+          "zip"
+        ],
+        "properties": {
+          "country": {
+            "type": "string",
+            "description": "The 2-letter country code",
+            "maxLength": 2
+          },
+          "state": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "city": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "street": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "zip": {
+            "type": "string",
+            "maxLength": 16
+          }
+        }
+      },
+      "selfInvoiceIdentityNumberParam": {
+        "type": "string",
+        "maxLength": 30
+      },
+      "UserTypeParam": {
+        "type": "string",
+        "enum": [
+          "person",
+          "company",
+          "employee"
+        ]
+      },
+      "DepositEstimationParam": {
+        "type": "object",
+        "required": [
+          "minimum",
+          "maximum"
+        ],
+        "properties": {
+          "minimum": {
+            "type": "integer"
+          },
+          "maximum": {
+            "type": "integer"
+          }
+        }
+      },
+      "EmploymentStatus": {
+        "type": "string",
+        "enum": [
+          "employed",
+          "student",
+          "selfEmployed",
+          "retired",
+          "unemployed"
+        ]
+      },
+      "FundsOrigin": {
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/FundsOriginTypes"
+          },
+          "othersReason": {
+            "type": "string"
+          }
+        }
+      },
+      "FundsOriginTypes": {
+        "type": "string",
+        "enum": [
+          "salary",
+          "incomes",
+          "investments",
+          "pensions",
+          "donations",
+          "propertiesSell",
+          "others"
+        ]
+      },
+      "CompanyParam": {
+        "type": "object",
+        "properties": {
+          "businessName": {
+            "type": "string"
+          },
+          "kindOfSociety": {
+            "type": "string"
+          },
+          "constitutionDate": {
+            "$ref": "#/components/schemas/DateISO8601Param"
+          },
+          "constitutionCountryCode": {
+            "$ref": "#/components/schemas/CountryISO3166-1Alpha2Param"
+          },
+          "registeredOffice": {
+            "type": "string"
+          },
+          "sector": {
+            "type": "string"
+          },
+          "autonomus": {
+            "type": "boolean"
+          },
+          "obligedSubject": {
+            "type": "boolean"
+          },
+          "overTheCounter": {
+            "type": "boolean"
+          },
+          "politicallyExposedPersonPartners": {
+            "type": "boolean"
+          },
+          "politicalPartners": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "firstTradeEstimatedValue": {
+            "type": "integer"
+          },
+          "annualTradeEstimatedValue": {
+            "type": "integer"
+          },
+          "billingVolume": {
+            "type": "integer"
+          },
+          "numberOfPartners": {
+            "type": "integer"
+          },
+          "reasonForTheOperation": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "typeOfOperationsToPerform": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "identity": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "idcard",
+                  "passport",
+                  "drivinglicense",
+                  "visa",
+                  "cif"
+                ]
+              },
+              "number": {
+                "type": "string",
+                "maxLength": 24
+              },
+              "countryCode": {
+                "$ref": "#/components/schemas/CountryISO3166-1Alpha2Param"
+              },
+              "updatedAt": {
+                "$ref": "#/components/schemas/DateISO8601Param"
+              }
+            }
+          },
+          "taxId": {
+            "type": "string"
+          },
+          "legalEntityId": {
+            "type": "string"
+          },
+          "contact": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "surname": {
+                "type": "string"
+              },
+              "typeOfDocument": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "idcard",
+                  "foreign-id-card",
+                  "passport",
+                  "drivinglicense",
+                  "visa"
+                ]
+              },
+              "numberOfDocument": {
+                "type": "string",
+                "maxLength": 24
+              }
+            }
+          },
+          "attorneyInFact": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "surname": {
+                "type": "string"
+              },
+              "typeOfDocument": {
+                "type": "string",
+                "enum": [
+                  "none",
+                  "idcard",
+                  "foreign-id-card",
+                  "passport",
+                  "drivinglicense",
+                  "visa"
+                ]
+              },
+              "numberOfDocument": {
+                "type": "string",
+                "maxLength": 24
+              }
+            }
+          },
+          "legalTerms": {
+            "type": "boolean"
+          },
+          "service": {
+            "type": "string"
+          },
+          "webUrl": {
+            "type": "stringnull"
+          },
+          "shareholdingStructure": {
+            "type": "stringnull"
+          },
+          "services": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "crypto_investment",
+                "send_crypto",
+                "liquidity",
+                "earn_loan",
+                "api",
+                "consulting",
+                "other"
+              ]
+            }
+          },
+          "otherServices": {
+            "type": "stringnull"
+          },
+          "partners": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "companyPartnerId"
+              ],
+              "properties": {
+                "nationalityCountryCode": {
+                  "$ref": "#/components/schemas/CountryISO3166-1Alpha2Param"
+                },
+                "companyPartnerId": {
+                  "$ref": "#/components/schemas/UserIdParam"
+                },
+                "documentType": {
+                  "type": "string",
+                  "enum": [
+                    "none",
+                    "idcard",
+                    "foreign-id-card",
+                    "passport",
+                    "drivinglicense",
+                    "visa"
+                  ]
+                },
+                "documentNumber": {
+                  "type": "string",
+                  "maxLength": 24
+                },
+                "documentCountryCode": {
+                  "$ref": "#/components/schemas/CountryISO3166-1Alpha2Param"
+                },
+                "birthdate": {
+                  "$ref": "#/components/schemas/DateISO8601Param"
+                },
+                "documentExpirationDate": {
+                  "$ref": "#/components/schemas/DateISO8601Param"
+                },
+                "sharePercentage": {
+                  "type": "number"
+                },
+                "fullName": {
+                  "type": "string"
+                },
+                "isPoliticallyExposed": {
+                  "type": "boolean"
+                },
+                "deletedAt": {
+                  "$ref": "#/components/schemas/DateTimeISO8601Param"
+                }
+              }
+            }
+          },
+          "economicCapacityModel": {
+            "type": "string",
+            "enum": [
+              "model_200",
+              "model_390",
+              "model_303"
+            ]
+          }
+        }
+      },
+      "CountryISO3166-1Alpha2Param": {
+        "type": "string",
+        "pattern": "^[A-Z]{2}$"
+      },
+      "CountryISO3166-1Alpha3Param": {
+        "type": "string",
+        "pattern": "^[A-Z]{3}$"
+      },
+      "TokenResponse": {
+        "type": "object",
+        "required": [
+          "token",
+          "expirationTime"
+        ],
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "expirationTime": {
+            "type": "integer"
+          }
+        }
+      },
+      "SessionResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "expirationTime"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          },
+          "expirationTime": {
+            "type": "integer"
+          }
+        }
+      },
+      "StatusParam": {
+        "type": "string",
+        "enum": [
+          "nodata",
+          "pending",
+          "verified",
+          "error"
+        ]
+      },
+      "ErrorsParam": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": [
+            "number",
+            "expiryDate",
+            "noDocUploaded",
+            "imageDoc",
+            "imageSelfie",
+            "other",
+            "unacceptableRisk",
+            "underAge",
+            "fraud",
+            "noNationality",
+            "idCountryDiffersResidenceCountry",
+            "kycUpdateRequired"
+          ]
+        }
+      },
+      "RiskRangeParam": {
+        "type": "object",
+        "required": [
+          "level"
+        ],
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": [
+              "undefined",
+              "low",
+              "medium",
+              "high",
+              "unacceptable"
+            ]
+          },
+          "minPoints": {
+            "$ref": "#/components/schemas/PointsParam"
+          },
+          "maxPoints": {
+            "$ref": "#/components/schemas/PointsParam"
+          },
+          "action": {
+            "type": "string",
+            "maxLength": 120
+          }
+        }
+      },
+      "PointsParam": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10
+      },
+      "Purpose": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "description",
+          "langCode"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "langCode": {
+            "type": "string"
+          }
+        }
+      },
+      "Profession": {
+        "type": "object",
+        "required": [
+          "id",
+          "description",
+          "professionCode",
+          "langCode"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "professionCode": {
+            "type": "string"
+          },
+          "langCode": {
+            "type": "string"
+          }
+        }
+      },
+      "OrderData": {
+        "type": "object",
+        "required": [
+          "createdAt",
+          "type",
+          "orderId",
+          "description",
+          "userId",
+          "currency",
+          "amountBeforeFee",
+          "amountAfterFee",
+          "fixedFee",
+          "variableFee",
+          "variableFeePercentage",
+          "status",
+          "annotations"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "type": {
+            "type": "string"
+          },
+          "orderId": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "pocketId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "annotations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AnnotationData"
+            }
+          },
+          "reviewer": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "amountBeforeFee": {
+            "type": "string"
+          },
+          "amountAfterFee": {
+            "type": "string"
+          },
+          "fixedFee": {
+            "type": "string"
+          },
+          "variableFee": {
+            "type": "string"
+          },
+          "variableFeePercentage": {
+            "type": "string"
+          },
+          "paymentMethod": {
+            "type": "string",
+            "enum": [
+              "bankpaymentslip",
+              "cash",
+              "creditcard",
+              "online",
+              "pix",
+              "transfer"
+            ]
+          },
+          "source": {
+            "type": "string"
+          },
+          "sourceId": {
+            "type": "string"
+          },
+          "cardId": {
+            "type": "string"
+          },
+          "secure": {
+            "type": "boolean"
+          },
+          "service": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          },
+          "walletOrderId": {
+            "type": "string"
+          },
+          "reference": {
+            "type": "string"
+          },
+          "bankReference": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "bankAccount": {
+            "type": "string"
+          },
+          "receiverName": {
+            "type": "string"
+          },
+          "bankName": {
+            "type": "string"
+          },
+          "bankAddress": {
+            "type": "string"
+          }
+        }
+      },
+      "AnnotationData": {
+        "type": "object",
+        "required": [
+          "createdAt",
+          "description",
+          "fromStatus",
+          "toStatus",
+          "userId"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "fromStatus": {
+            "type": "string"
+          },
+          "toStatus": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          }
+        }
+      },
+      "PayOrderData": {
+        "type": "object",
+        "required": [
+          "orderId",
+          "createdAt",
+          "expiryDate",
+          "userId",
+          "pocketId",
+          "type",
+          "currency",
+          "amount",
+          "status",
+          "walletMovementId",
+          "statusChanges",
+          "senderName"
+        ],
+        "properties": {
+          "orderId": {
+            "$ref": "#/components/schemas/ProformaIdParam"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiryDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "userId": {
+            "$ref": "#/components/schemas/UserIdParam"
+          },
+          "pocketId": {
+            "$ref": "#/components/schemas/PocketIdParam"
+          },
+          "type": {
+            "$ref": "#/components/schemas/PayOrderType"
+          },
+          "email": {
+            "$ref": "#/components/schemas/EmailParam"
+          },
+          "phone": {
+            "$ref": "#/components/schemas/PhoneParam"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/ExtendedCurrencyParam"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/AmountParam"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PayOrderStatus"
+          },
+          "statusChanges": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "newStatus": {
+                  "$ref": "#/components/schemas/PayOrderStatus"
+                },
+                "author": {
+                  "$ref": "#/components/schemas/UserIdParam"
+                },
+                "created": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "reason": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "senderName": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "walletMovementId": {
+            "$ref": "#/components/schemas/ProformaIdParam"
+          }
+        }
+      },
+      "CreatePayOrderDto": {
+        "type": "object",
+        "required": [
+          "pocketId",
+          "type",
+          "amount",
+          "currency"
+        ],
+        "properties": {
+          "pocketId": {
+            "$ref": "#/components/schemas/PocketIdParam"
+          },
+          "type": {
+            "$ref": "#/components/schemas/PayOrderType"
+          },
+          "email": {
+            "$ref": "#/components/schemas/EmailParam"
+          },
+          "phone": {
+            "$ref": "#/components/schemas/PhoneParam"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/AmountParam"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/CurrencyParam"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      },
+      "PayOrderStatus": {
+        "type": "string",
+        "enum": [
+          "waiting-funds",
+          "pending",
+          "accepted",
+          "cancelled",
+          "expired",
+          "error"
+        ]
+      },
+      "PayOrderType": {
+        "type": "string",
+        "enum": [
+          "email",
+          "phone",
+          "alias"
+        ]
+      },
+      "IdParam": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+      },
+      "CustomerRequestTransaction": {
+        "type": "object",
+        "required": "-userId -amount -pair -createdAt",
+        "properties": {
+          "userId": {
+            "$ref": "#/components/schemas/UserIdParam"
+          },
+          "amount": {
+            "$ref": "#/components/schemas/AmountParam"
+          },
+          "pair": {
+            "type": "string",
+            "enum": [
+              "BTC/EUR",
+              "B2M/EUR",
+              "..."
+            ]
+          },
+          "createdAt": {
+            "$ref": "#/components/schemas/DateTimeISO8601Param",
+            "description": "When the transaction was created (ISO 8601)"
+          }
+        }
+      },
+      "TotpParam": {
+        "type": "string",
+        "pattern": "^[0-9]{4,6}$"
+      },
+      "TotpTypeParam": {
+        "type": "string",
+        "enum": [
+          "gauth",
+          "email",
+          "sms",
+          "call",
+          "whatsapp"
+        ]
+      },
+      "ExecuteOrderData": {
+        "type": "object",
+        "required": [
+          "orderId",
+          "status"
+        ],
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "example": "ExecuteOrderData"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "waiting-user",
+              "rejected",
+              "accepted"
+            ]
+          },
+          "token": {
+            "type": "string",
+            "example": "7w5gw7bw35gpb5hpgw6ph"
+          },
+          "provider": {
+            "$ref": "#/components/schemas/ProviderData"
+          }
+        }
+      },
+      "ProviderData": {
+        "type": "object",
+        "required": [
+          "requestConfiguration"
+        ],
+        "properties": {
+          "requestConfiguration": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "example": "iframe"
+              },
+              "uri": {
+                "type": "string",
+                "example": "https://example.url"
+              }
+            }
+          }
+        }
+      },
+      "CreateOrderData": {
+        "type": "object",
+        "required": [
+          "orderId",
+          "denomination",
+          "currency",
+          "amountBeforeFee",
+          "amountAfterFee",
+          "fixedFee",
+          "variableFee",
+          "variableFeePercentage"
+        ],
+        "properties": {
+          "orderId": {
+            "type": "string"
+          },
+          "denomination": {
+            "type": "object"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "amountBeforeFee": {
+            "type": "string"
+          },
+          "amountAfterFee": {
+            "type": "string"
+          },
+          "fixedFee": {
+            "type": "string"
+          },
+          "variableFee": {
+            "type": "string"
+          },
+          "variableFeePercentage": {
+            "type": "string"
+          },
+          "benefit": {
+            "type": "object",
+            "required": [
+              "amount",
+              "currency",
+              "percentage",
+              "tier"
+            ],
+            "properties": {
+              "amount": {
+                "type": "string",
+                "example": 0.33
+              },
+              "currency": {
+                "type": "string",
+                "example": "EUR"
+              },
+              "percentage": {
+                "type": "number",
+                "example": 25
+              },
+              "tier": {
+                "type": "number",
+                "example": 4
+              },
+              "levelId": {
+                "type": "string",
+                "example": "c1886992-5e48-4d8c-8296-a5d89f2f04cf"
+              }
+            }
+          }
+        }
+      },
+      "CountryResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "iso",
+            "iso3",
+            "name",
+            "fips"
+          ],
+          "properties": {
+            "iso": {
+              "$ref": "#/components/schemas/CountryISO3166-1Alpha2Param"
+            },
+            "iso3": {
+              "$ref": "#/components/schemas/CountryISO3166-1Alpha3Param"
+            },
+            "name": {
+              "type": "string"
+            },
+            "fips": {
+              "type": "string",
+              "description": "Federal Information Processing Standard  (https://en.wikipedia.org/wiki/Federal_Information_Processing_Standards)"
+            }
+          }
+        }
+      },
+      "CurrencyNotAcceptable": {
+        "required": [
+          "message",
+          "error",
+          "statusCode",
+          "reqId",
+          "data"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string"
+          },
+          "statusCode": {
+            "type": "number"
+          },
+          "reqId": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      },
+      "LoanLTV": {
+        "properties": {
+          "guaranteeCurrency": {
+            "type": "string",
+            "example": "BTC"
+          },
+          "guaranteeAmount": {
+            "type": "string",
+            "example": "0.5678"
+          },
+          "guaranteeAmountConverted": {
+            "type": "string",
+            "example": "57000.34"
+          },
+          "loanCurrency": {
+            "type": "string",
+            "example": "USDC"
+          },
+          "loanAmount": {
+            "type": "string",
+            "example": "1250.34"
+          },
+          "loanAmountConverted": {
+            "type": "string",
+            "example": "1300.34"
+          },
+          "apr": {
+            "type": "string",
+            "example": "13.12"
+          },
+          "ltv": {
+            "type": "string",
+            "example": "0.5"
+          },
+          "userCurrency": {
+            "type": "string",
+            "example": "EUR"
+          }
+        }
+      },
+      "LoanConfig": {
+        "properties": {
+          "loanCurrencies": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "currencyConfigurationLoanId": {
+                  "type": "string",
+                  "format": "uuid",
+                  "example": "5a235979-dbfe-4830-8dbd-c85548bcfcf4"
+                },
+                "currency": {
+                  "type": "string",
+                  "example": "USDC"
+                },
+                "enabled": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "liquidity": {
+                  "type": "string",
+                  "example": "250000.000000000000000000"
+                },
+                "liquidityStatus": {
+                  "type": "string",
+                  "example": "high"
+                },
+                "apr": {
+                  "type": "string",
+                  "example": "0.130000000000000000"
+                },
+                "minimumAmount": {
+                  "type": "string",
+                  "example": "100.000000000000000000"
+                },
+                "maximumAmount": {
+                  "type": "string",
+                  "example": "250000.000000000000000000"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2024-07-16T15:49:30.646Z"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2024-07-16T15:49:30.646Z"
+                }
+              }
+            }
+          },
+          "guaranteeCurrencies": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "currencyConfigurationGuaranteeId": {
+                  "type": "string",
+                  "format": "uuid",
+                  "example": "5a235979-dbfe-4830-8dbd-c85548bcfcf4"
+                },
+                "currency": {
+                  "type": "string",
+                  "example": "BTC"
+                },
+                "enabled": {
+                  "type": "boolean",
+                  "example": true
+                },
+                "liquidationLtv": {
+                  "type": "string",
+                  "example": "0.8500"
+                },
+                "initialLtv": {
+                  "type": "string",
+                  "example": "0.5000"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2024-07-16T15:49:30.646Z"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2024-07-16T15:49:30.646Z"
+                }
+              }
+            }
+          }
+        }
+      },
+      "LoanMovements": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "example": 0
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "movementId": {
+                  "type": "string",
+                  "example": "a3ae8549-bf84-42d0-af28-a7bf6cd84e2d"
+                },
+                "orderId": {
+                  "type": "string",
+                  "example": "a3ae8549-bf84-42d0-af28-a7bf6cd84e2d"
+                },
+                "userId": {
+                  "type": "string",
+                  "example": "a3ae8549-bf84-42d0-af28-a7bf6cd84e2d"
+                },
+                "type": {
+                  "type": "string",
+                  "example": "request"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2023-01-01T12:00:00Z"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2023-01-01T12:00:00Z"
+                },
+                "payload": {
+                  "type": "object",
+                  "properties": {
+                    "ltv": {
+                      "type": "string",
+                      "example": "0.3424"
+                    },
+                    "previousLtv": {
+                      "type": "string",
+                      "example": "0.3870"
+                    },
+                    "liquidationLtv": {
+                      "type": "string",
+                      "example": "0.85"
+                    },
+                    "guaranteeAmount": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "string",
+                          "example": "0.150000000000000000"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "example": "BTC"
+                        },
+                        "converted": {
+                          "type": "string",
+                          "example": "9191.984999999999148292"
+                        },
+                        "convertedCurrency": {
+                          "type": "string",
+                          "example": "EUR"
+                        }
+                      }
+                    },
+                    "isCompleted": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "loanAmount": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "string",
+                          "example": "0.150000000000000000"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "example": "BTC"
+                        },
+                        "converted": {
+                          "type": "string",
+                          "example": "9191.984999999999148292"
+                        },
+                        "convertedCurrency": {
+                          "type": "string",
+                          "example": "EUR"
+                        }
+                      }
+                    },
+                    "paybackAmount": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "string",
+                          "example": "0.150000000000000000"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "example": "BTC"
+                        },
+                        "converted": {
+                          "type": "string",
+                          "example": "9191.984999999999148292"
+                        },
+                        "convertedCurrency": {
+                          "type": "string",
+                          "example": "EUR"
+                        }
+                      }
+                    },
+                    "guaranteeAmountLiquidated": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "string",
+                          "example": "0.520468532809071248"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "example": "BTC"
+                        },
+                        "converted": {
+                          "type": "string",
+                          "example": "28588.989999999999432194"
+                        },
+                        "convertedCurrency": {
+                          "type": "string",
+                          "example": "EUR"
+                        }
+                      }
+                    },
+                    "feeAmountLiquidated": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "string",
+                          "example": "0.010409371520468532"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "example": "BTC"
+                        },
+                        "converted": {
+                          "type": "string",
+                          "example": "571.749417296672432194"
+                        },
+                        "convertedCurrency": {
+                          "type": "string",
+                          "example": "EUR"
+                        }
+                      }
+                    },
+                    "isPromotional": {
+                      "type": "boolean",
+                      "example": false
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "LoanOrders": {
+        "properties": {
+          "total": {
+            "type": "integer",
+            "example": 0
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "orderId": {
+                  "type": "string",
+                  "example": "af87f803-8c4e-4250-b731-16c7089fa321"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2024-07-16T15:49:30.646Z"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2024-07-16T15:49:30.646Z"
+                },
+                "userId": {
+                  "type": "string",
+                  "example": "5a235979-dbfe-4830-8dbd-c85548bcfcf4"
+                },
+                "requestedByUserId": {
+                  "type": "string",
+                  "example": "3e431bd9-7c62-45e2-a01b-76fe5579d574"
+                },
+                "guaranteeCurrency": {
+                  "type": "string",
+                  "example": "BTC"
+                },
+                "guaranteeOriginalAmount": {
+                  "type": "string",
+                  "example": "0.5678"
+                },
+                "guaranteeAmount": {
+                  "type": "string",
+                  "example": "0.5678"
+                },
+                "loanCurrency": {
+                  "type": "string",
+                  "example": "USDC"
+                },
+                "loanOriginalAmount": {
+                  "type": "string",
+                  "example": "1250.34"
+                },
+                "loanAmount": {
+                  "type": "string",
+                  "example": "1250.34"
+                },
+                "paybackAmount": {
+                  "type": "string",
+                  "example": "0"
+                },
+                "ltv": {
+                  "type": "string",
+                  "example": "0.500000000000000000"
+                },
+                "apr": {
+                  "type": "string",
+                  "example": "0.130000000000000000"
+                },
+                "status": {
+                  "type": "string",
+                  "example": "pending"
+                },
+                "startedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2024-07-16T15:49:30.646Z"
+                },
+                "finishedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2024-07-16T15:49:30.646Z"
+                },
+                "expiresAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2024-07-16T15:49:30.646Z"
+                },
+                "paybackPrincipalAmount": {
+                  "type": "string",
+                  "example": "950.690000000000000000"
+                },
+                "paybackInterestAmount": {
+                  "type": "string",
+                  "example": "10.150000000000000000"
+                },
+                "interestAmount": {
+                  "type": "string",
+                  "example": "115.270000000000000000"
+                },
+                "loanAmountConverted": {
+                  "type": "string",
+                  "example": "38931.793588456235913714"
+                },
+                "paybackAmountConverted": {
+                  "type": "string",
+                  "example": "23359.513625974162440426"
+                },
+                "guaranteeAmountConverted": {
+                  "type": "string",
+                  "example": "31191.581979999999508567"
+                },
+                "remainingAmount": {
+                  "type": "string",
+                  "example": "15572.279962482073473288"
+                },
+                "remainingAmountConverted": {
+                  "type": "string",
+                  "example": "17592.138960462073473288"
+                },
+                "remainingPrincipalAmount": {
+                  "type": "string",
+                  "example": "17299.650000000000000000"
+                },
+                "remainingInterestAmount": {
+                  "type": "string",
+                  "example": "392.450000000000000000"
+                },
+                "liquidationPriceReference": {
+                  "type": "string",
+                  "example": "32262.473788235293609342"
+                },
+                "discount": {
+                  "type": "string",
+                  "example": "0.5"
+                },
+                "isUserApprovalRequired": {
+                  "type": "boolean",
+                  "example": false
+                }
+              }
+            }
+          }
+        }
+      },
+      "CreateLoan": {
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "example": "af87f803-8c4e-4250-b731-16c7089fa321"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-16T15:49:30.646Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-16T15:49:30.646Z"
+          },
+          "userId": {
+            "type": "string",
+            "example": "5a235979-dbfe-4830-8dbd-c85548bcfcf4"
+          },
+          "requestedByUserId": {
+            "type": "string",
+            "example": "3e431bd9-7c62-45e2-a01b-76fe5579d574"
+          },
+          "guaranteeCurrency": {
+            "type": "string",
+            "example": "BTC"
+          },
+          "guaranteeOriginalAmount": {
+            "type": "string",
+            "example": "0.5678"
+          },
+          "guaranteeAmount": {
+            "type": "string",
+            "example": "0.5678"
+          },
+          "loanCurrency": {
+            "type": "string",
+            "example": "USDC"
+          },
+          "loanOriginalAmount": {
+            "type": "string",
+            "example": "1250.34"
+          },
+          "loanAmount": {
+            "type": "string",
+            "example": "1250.34"
+          },
+          "paybackAmount": {
+            "type": "string",
+            "example": "0"
+          },
+          "ltv": {
+            "type": "string",
+            "example": "0.500000000000000000"
+          },
+          "apr": {
+            "type": "string",
+            "example": "0.130000000000000000"
+          },
+          "status": {
+            "type": "string",
+            "example": "pending"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-16T15:49:30.646Z"
+          },
+          "finishedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-16T15:49:30.646Z"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-16T15:49:30.646Z"
+          },
+          "paybackPrincipalAmount": {
+            "type": "string",
+            "example": "950.690000000000000000"
+          },
+          "paybackInterestAmount": {
+            "type": "string",
+            "example": "10.150000000000000000"
+          },
+          "interestAmount": {
+            "type": "string",
+            "example": "115.270000000000000000"
+          }
+        }
+      },
+      "UserLoan": {
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "example": "af87f803-8c4e-4250-b731-16c7089fa321"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-16T15:49:30.646Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-16T15:49:30.646Z"
+          },
+          "userId": {
+            "type": "string",
+            "example": "5a235979-dbfe-4830-8dbd-c85548bcfcf4"
+          },
+          "requestedByUserId": {
+            "type": "string",
+            "example": "3e431bd9-7c62-45e2-a01b-76fe5579d574"
+          },
+          "guaranteeCurrency": {
+            "type": "string",
+            "example": "BTC"
+          },
+          "guaranteeOriginalAmount": {
+            "type": "string",
+            "example": "0.5678"
+          },
+          "guaranteeAmount": {
+            "type": "string",
+            "example": "0.5678"
+          },
+          "loanCurrency": {
+            "type": "string",
+            "example": "USDC"
+          },
+          "loanOriginalAmount": {
+            "type": "string",
+            "example": "1250.34"
+          },
+          "loanAmount": {
+            "type": "string",
+            "example": "1250.34"
+          },
+          "paybackAmount": {
+            "type": "string",
+            "example": "0"
+          },
+          "ltv": {
+            "type": "string",
+            "example": "0.500000000000000000"
+          },
+          "apr": {
+            "type": "string",
+            "example": "0.130000000000000000"
+          },
+          "status": {
+            "type": "string",
+            "example": "pending"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-16T15:49:30.646Z"
+          },
+          "finishedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-16T15:49:30.646Z"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-16T15:49:30.646Z"
+          },
+          "paybackPrincipalAmount": {
+            "type": "string",
+            "example": "950.690000000000000000"
+          },
+          "paybackInterestAmount": {
+            "type": "string",
+            "example": "10.150000000000000000"
+          },
+          "interestAmount": {
+            "type": "string",
+            "example": "115.270000000000000000"
+          },
+          "loanAmountConverted": {
+            "type": "string",
+            "example": "38931.793588456235913714"
+          },
+          "paybackAmountConverted": {
+            "type": "string",
+            "example": "23359.513625974162440426"
+          },
+          "guaranteeAmountConverted": {
+            "type": "string",
+            "example": "31191.581979999999508567"
+          },
+          "remainingAmount": {
+            "type": "string",
+            "example": "15572.279962482073473288"
+          },
+          "remainingAmountConverted": {
+            "type": "string",
+            "example": "17592.138960462073473288"
+          },
+          "remainingPrincipalAmount": {
+            "type": "string",
+            "example": "17299.650000000000000000"
+          },
+          "remainingInterestAmount": {
+            "type": "string",
+            "example": "392.450000000000000000"
+          },
+          "liquidationPriceReference": {
+            "type": "string",
+            "example": "32262.473788235293609342"
+          },
+          "discount": {
+            "type": "string",
+            "example": "0.5"
+          },
+          "isUserApprovalRequired": {
+            "type": "boolean",
+            "example": false
+          }
+        }
+      },
+      "loanAction": {
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "example": "af87f803-8c4e-4250-b731-16c7089fa321"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-16T15:49:30.646Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-16T15:49:30.646Z"
+          },
+          "userId": {
+            "type": "string",
+            "example": "5a235979-dbfe-4830-8dbd-c85548bcfcf4"
+          },
+          "requestedByUserId": {
+            "type": "string",
+            "example": "3e431bd9-7c62-45e2-a01b-76fe5579d574"
+          },
+          "guaranteeCurrency": {
+            "type": "string",
+            "example": "BTC"
+          },
+          "guaranteeOriginalAmount": {
+            "type": "string",
+            "example": "0.5678"
+          },
+          "guaranteeAmount": {
+            "type": "string",
+            "example": "0.5678"
+          },
+          "loanCurrency": {
+            "type": "string",
+            "example": "USDC"
+          },
+          "loanOriginalAmount": {
+            "type": "string",
+            "example": "1250.34"
+          },
+          "loanAmount": {
+            "type": "string",
+            "example": "1250.34"
+          },
+          "paybackAmount": {
+            "type": "string",
+            "example": "0"
+          },
+          "ltv": {
+            "type": "string",
+            "example": "0.500000000000000000"
+          },
+          "apr": {
+            "type": "string",
+            "example": "0.130000000000000000"
+          },
+          "status": {
+            "type": "string",
+            "example": "pending"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-16T15:49:30.646Z"
+          },
+          "finishedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-16T15:49:30.646Z"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-07-16T15:49:30.646Z"
+          },
+          "paybackPrincipalAmount": {
+            "type": "string",
+            "example": "950.690000000000000000"
+          },
+          "paybackInterestAmount": {
+            "type": "string",
+            "example": "10.150000000000000000"
+          },
+          "interestAmount": {
+            "type": "string",
+            "example": "115.270000000000000000"
+          }
+        }
+      },
+      "sfaTMR": {
+        "required": [
+          "message",
+          "error"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "rateLimitRemaining"
+          },
+          "error": {
+            "type": "string"
+          },
+          "statusCode": {
+            "type": "number"
+          },
+          "reqId": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          },
+          "retryIntervalSeconds": {
+            "type": "number",
+            "example": 600
+          }
+        }
+      },
+      "walletTransaction": {
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "example": "f040acdf-62b0-4040-9574-655fdcf7e541"
+                },
+                "note": {
+                  "type": "string",
+                  "example": "This is a transaction note"
+                },
+                "date": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2024-03-28T13:06:18.032Z"
+                },
+                "completedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2024-03-28T13:06:18.032Z"
+                },
+                "canceledAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2024-03-28T13:06:18.032Z"
+                },
+                "concept": {
+                  "type": "string",
+                  "example": "Concept of the transaction"
+                },
+                "type": {
+                  "type": "string",
+                  "example": "transfer"
+                },
+                "subtype": {
+                  "type": "string",
+                  "example": "purchase"
+                },
+                "method": {
+                  "type": "string",
+                  "example": "pocket"
+                },
+                "status": {
+                  "type": "string",
+                  "example": "completed"
+                },
+                "substractFeeType": {
+                  "type": "string",
+                  "example": "SEA"
+                },
+                "denomination": {
+                  "properties": {
+                    "amount": {
+                      "type": "string",
+                      "example": "1.00000000"
+                    },
+                    "currency": {
+                      "type": "string",
+                      "example": "EUR"
+                    },
+                    "rate": {
+                      "properties": {
+                        "rate": {
+                          "properties": {
+                            "value": {
+                              "type": "string",
+                              "example": "227887340800401254"
+                            },
+                            "pair": {
+                              "properties": {
+                                "base": {
+                                  "type": "string",
+                                  "example": "string"
+                                },
+                                "quote": {
+                                  "type": "string",
+                                  "example": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "frequency": {
+                  "type": "string",
+                  "example": "punctual"
+                },
+                "isInitialRecurringOrder": {
+                  "type": "boolean",
+                  "example": false
+                },
+                "origin": {
+                  "properties": {
+                    "currency": {
+                      "type": "string",
+                      "example": "EUR"
+                    },
+                    "pocketName": {
+                      "type": "string",
+                      "example": "Euro pocket"
+                    },
+                    "pocketId": {
+                      "type": "string",
+                      "example": "9ca6cf96-4645-4658-b086-6cdb367c16bd"
+                    },
+                    "bankAccount": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "email": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "phone": {
+                      "properties": {
+                        "number": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "countryCode": {
+                          "type": "string",
+                          "example": "string"
+                        }
+                      }
+                    },
+                    "alias": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "fullName": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "address": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "addressNetwork": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "addressTag": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "addressInBlacklist": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "amount": {
+                      "type": "string",
+                      "example": "1.00000000"
+                    },
+                    "amountAfterFees": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "rate": {
+                      "properties": {
+                        "rate": {
+                          "properties": {
+                            "value": {
+                              "type": "string",
+                              "example": "64109951628652730944317449085"
+                            },
+                            "pair": {
+                              "properties": {
+                                "base": {
+                                  "type": "string",
+                                  "example": "string"
+                                },
+                                "quote": {
+                                  "type": "string",
+                                  "example": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "converted": {
+                      "properties": {
+                        "amount": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "amountAfterFees": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "example": "string"
+                        }
+                      }
+                    },
+                    "userAmount": {
+                      "properties": {
+                        "currency": {
+                          "type": "string",
+                          "example": "EUR"
+                        },
+                        "value": {
+                          "type": "string",
+                          "example": "0.99500000"
+                        }
+                      }
+                    },
+                    "userId": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "class": {
+                      "type": "string",
+                      "example": "pocket"
+                    }
+                  }
+                },
+                "destination": {
+                  "properties": {
+                    "currency": {
+                      "type": "string",
+                      "example": "EUR"
+                    },
+                    "pocketName": {
+                      "type": "string",
+                      "example": "Euro pocket"
+                    },
+                    "pocketId": {
+                      "type": "string",
+                      "example": "9ca6cf96-4645-4658-b086-6cdb367c16bd"
+                    },
+                    "bankAccount": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "email": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "phone": {
+                      "properties": {
+                        "number": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "countryCode": {
+                          "type": "string",
+                          "example": "string"
+                        }
+                      }
+                    },
+                    "alias": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "fullName": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "address": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "addressNetwork": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "addressTag": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "addressInBlacklist": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "amount": {
+                      "type": "string",
+                      "example": "1.00000000"
+                    },
+                    "amountAfterFees": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "rate": {
+                      "properties": {
+                        "rate": {
+                          "properties": {
+                            "value": {
+                              "type": "string",
+                              "example": "44502283176925129659630346180939"
+                            },
+                            "pair": {
+                              "properties": {
+                                "base": {
+                                  "type": "string",
+                                  "example": "string"
+                                },
+                                "quote": {
+                                  "type": "string",
+                                  "example": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "converted": {
+                      "properties": {
+                        "amount": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "amountAfterFees": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "example": "string"
+                        }
+                      }
+                    },
+                    "userAmount": {
+                      "properties": {
+                        "currency": {
+                          "type": "string",
+                          "example": "EUR"
+                        },
+                        "value": {
+                          "type": "string",
+                          "example": "0.99500000"
+                        }
+                      }
+                    },
+                    "userId": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "class": {
+                      "type": "string",
+                      "example": "pocket"
+                    }
+                  }
+                },
+                "transaction": {
+                  "properties": {
+                    "hash": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "confirmedAt": {
+                      "type": "string",
+                      "example": "string"
+                    },
+                    "confirmationCount": {
+                      "type": "integer",
+                      "example": 0
+                    }
+                  }
+                },
+                "fee": {
+                  "properties": {
+                    "network": {
+                      "properties": {
+                        "amount": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "example": "string"
+                        }
+                      }
+                    },
+                    "flip": {
+                      "properties": {
+                        "percentage": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "amount": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "currency": {
+                          "type": "string",
+                          "example": "string"
+                        }
+                      }
+                    },
+                    "teller": {
+                      "properties": {
+                        "fixed": {
+                          "properties": {
+                            "amount": {
+                              "type": "string",
+                              "example": "string"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "example": "string"
+                            }
+                          }
+                        },
+                        "variable": {
+                          "properties": {
+                            "percentage": {
+                              "type": "string",
+                              "example": "string"
+                            },
+                            "amount": {
+                              "type": "string",
+                              "example": "string"
+                            },
+                            "currency": {
+                              "type": "string",
+                              "example": "string"
+                            }
+                          }
+                        },
+                        "id": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "feeCurrency": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "fixedFee": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "variableFee": {
+                          "type": "string",
+                          "example": "string"
+                        },
+                        "variableFeePercentage": {
+                          "type": "string",
+                          "example": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "flip": {
+                  "properties": {
+                    "rate": {
+                      "properties": {
+                        "value": {
+                          "type": "string",
+                          "example": "50547463180856306652608572641483737727703894078151"
+                        },
+                        "pair": {
+                          "properties": {
+                            "base": {
+                              "type": "string",
+                              "example": "string"
+                            },
+                            "quote": {
+                              "type": "string",
+                              "example": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "benefit": {
+                  "properties": {
+                    "tier": {
+                      "type": "integer",
+                      "example": 0
+                    },
+                    "levelId": {
+                      "type": "string",
+                      "example": "d140c42a-be88-4987-8c3d-38635124ec69"
+                    },
+                    "quantity": {
+                      "type": "string",
+                      "example": "0.000000000000000000"
+                    },
+                    "percentage": {
+                      "type": "integer",
+                      "example": 50
+                    },
+                    "currency": {
+                      "type": "string",
+                      "example": "B2M"
+                    },
+                    "amount": {
+                      "type": "number",
+                      "example": 0.53157921
+                    }
+                  }
+                },
+                "userRate": {
+                  "properties": {
+                    "rate": {
+                      "properties": {
+                        "value": {
+                          "type": "string",
+                          "example": "528366091465614317160787256192667"
+                        },
+                        "pair": {
+                          "properties": {
+                            "base": {
+                              "type": "string",
+                              "example": "string"
+                            },
+                            "quote": {
+                              "type": "string",
+                              "example": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "userAmount": {
+                  "properties": {
+                    "currency": {
+                      "type": "string",
+                      "example": "EUR"
+                    },
+                    "amount": {
+                      "type": "string",
+                      "example": "string"
+                    }
+                  }
+                },
+                "instantId": {
+                  "type": "string",
+                  "example": "2be1f76b-9332-4e96-9e58-8f9d65206b02"
+                },
+                "company": {
+                  "properties": {
+                    "destination": {
+                      "properties": {
+                        "currency": {
+                          "type": "string",
+                          "example": "EUR"
+                        },
+                        "amount": {
+                          "type": "string",
+                          "example": "41.00000000"
+                        },
+                        "rate": {
+                          "properties": {
+                            "value": {
+                              "type": "string",
+                              "example": "811106"
+                            },
+                            "pair": {
+                              "properties": {
+                                "base": {
+                                  "type": "string",
+                                  "example": "string"
+                                },
+                                "quote": {
+                                  "type": "string",
+                                  "example": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "total": {
+            "type": "integer",
+            "example": 15
+          }
+        }
+      },
+      "walletTransactionV3": {
+        "type": "object",
+        "required": [
+          "data",
+          "pageInfo"
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "description": "Transaction object. Same structure as items in walletTransaction.data."
+            }
+          },
+          "pageInfo": {
+            "type": "object",
+            "required": [
+              "hasNextPage",
+              "endCursor"
+            ],
+            "properties": {
+              "hasNextPage": {
+                "type": "boolean",
+                "example": true
+              },
+              "endCursor": {
+                "type": "string",
+                "nullable": true,
+                "example": "eyJjcmVhdGVkQXQiOiIyMDI2LTAyLTA1VDA4OjAwOjAwLjAwMFoifQ=="
+              }
+            }
+          }
+        }
+      },
+      "BlockchainAddressConfirmationStatus": {
+        "type": "object",
+        "required": [
+          "walletMovementId",
+          "address",
+          "network",
+          "isVerified"
+        ],
+        "properties": {
+          "walletMovementId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "7c9e6679-7425-40de-944b-e07fc1f90ae7"
+          },
+          "address": {
+            "type": "string",
+            "example": "0x1234567890abcdef1234567890abcdef12345678"
+          },
+          "network": {
+            "type": "string",
+            "example": "ethereum"
+          },
+          "memotag": {
+            "type": "string",
+            "nullable": true,
+            "example": null
+          },
+          "isVerified": {
+            "type": "boolean",
+            "example": false
+          },
+          "verifiedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": null
+          }
+        }
+      },
+      "CreateAddressResponseDto": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "enabled",
+              "pending"
+            ]
+          }
+        }
+      },
+      "FindAddressResponseDto": {
+        "type": "object",
+        "required": [
+          "createdAt",
+          "network",
+          "status"
+        ],
+        "properties": {
+          "address": {
+            "type": "string",
+            "example": "0xb7c913a1f23922768e9117c63d479f119322b5e8da9911405143fe32823e5da7"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the pocket was created (ISO 8601)"
+          },
+          "network": {
+            "type": "string",
+            "example": "ethereum"
+          },
+          "tag": {
+            "type": "string",
+            "example": "F525C9662979"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "enabled",
+              "pending"
+            ]
+          }
+        }
+      },
+      "CreateAddressBookRequestDto": {
+        "type": "object",
+        "required": [
+          "address",
+          "currency",
+          "network",
+          "walletType",
+          "walletOwnership"
+        ],
+        "properties": {
+          "address": {
+            "type": "string",
+            "example": 8.312852304999928e+76
+          },
+          "currency": {
+            "type": "string",
+            "example": "BTC"
+          },
+          "network": {
+            "type": "string",
+            "example": "bitcoin"
+          },
+          "tag": {
+            "type": "string",
+            "example": "123456"
+          },
+          "walletType": {
+            "type": "string",
+            "enum": [
+              "exchange",
+              "unhosted"
+            ]
+          },
+          "exchangeName": {
+            "type": "string",
+            "example": "Binance"
+          },
+          "walletOwnership": {
+            "type": "string",
+            "enum": [
+              "other",
+              "own"
+            ]
+          },
+          "personType": {
+            "type": "string",
+            "enum": [
+              "company",
+              "person"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "example": "John"
+          },
+          "surname": {
+            "type": "string",
+            "example": "Doe"
+          }
+        }
+      },
+      "CreateAddressBookResponseDto": {
+        "type": "object",
+        "required": [
+          "addressId",
+          "userId",
+          "address",
+          "currency",
+          "network",
+          "status",
+          "walletType",
+          "walletOwnership",
+          "createdAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "addressId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "network": {
+            "type": "string"
+          },
+          "tag": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "validating",
+              "verified",
+              "expired"
+            ]
+          },
+          "walletType": {
+            "type": "string",
+            "enum": [
+              "exchange",
+              "unhosted"
+            ]
+          },
+          "walletOwnership": {
+            "type": "string",
+            "enum": [
+              "other",
+              "own"
+            ]
+          },
+          "exchangeName": {
+            "type": "string"
+          },
+          "personType": {
+            "type": "string",
+            "enum": [
+              "company",
+              "person"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "surname": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "BlockchainManagerAmount": {
+        "type": "object",
+        "required": [
+          "value",
+          "currency"
+        ],
+        "properties": {
+          "value": {
+            "type": "string",
+            "example": "42.5"
+          },
+          "currency": {
+            "type": "string",
+            "example": "bitcoin"
+          }
+        }
+      },
+      "TravelRuleOrderIdentity": {
+        "type": "object",
+        "required": [
+          "countryCode",
+          "document",
+          "type"
+        ],
+        "properties": {
+          "countryCode": {
+            "type": "string",
+            "example": "ES"
+          },
+          "document": {
+            "type": "string",
+            "example": "12345678Z"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "cif",
+              "foreign-id-card",
+              "idcard",
+              "passport"
+            ]
+          }
+        }
+      },
+      "TravelRuleOrderAddress": {
+        "type": "object",
+        "required": [
+          "city",
+          "countryCode",
+          "street",
+          "zip"
+        ],
+        "properties": {
+          "city": {
+            "type": "string",
+            "example": "city"
+          },
+          "countryCode": {
+            "type": "string",
+            "example": "ES"
+          },
+          "street": {
+            "type": "string",
+            "example": "street name"
+          },
+          "zip": {
+            "type": "string",
+            "example": "12000"
+          }
+        }
+      },
+      "TravelRuleOrderPlaceOfBirth": {
+        "type": "object",
+        "required": [
+          "city",
+          "countryCode"
+        ],
+        "properties": {
+          "city": {
+            "type": "string",
+            "example": "Madrid"
+          },
+          "countryCode": {
+            "type": "string",
+            "example": "ES"
+          }
+        }
+      },
+      "TravelRuleOrderOrigin": {
+        "type": "object",
+        "properties": {
+          "personType": {
+            "type": "string",
+            "enum": [
+              "person",
+              "company"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "surname": {
+            "type": "string"
+          },
+          "identity": {
+            "$ref": "#/components/schemas/TravelRuleOrderIdentity"
+          },
+          "address": {
+            "$ref": "#/components/schemas/TravelRuleOrderAddress"
+          },
+          "placeOfBirth": {
+            "$ref": "#/components/schemas/TravelRuleOrderPlaceOfBirth"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "blockchainAddress": {
+            "type": "string"
+          },
+          "walletType": {
+            "type": "string",
+            "enum": [
+              "exchange",
+              "unhosted"
+            ]
+          },
+          "exchangeName": {
+            "type": "string"
+          },
+          "walletOwnership": {
+            "type": "string",
+            "enum": [
+              "own",
+              "other"
+            ]
+          }
+        }
+      },
+      "TravelRuleOrderDestination": {
+        "type": "object",
+        "required": [
+          "personType",
+          "name",
+          "blockchainAddress"
+        ],
+        "properties": {
+          "personType": {
+            "type": "string",
+            "enum": [
+              "person",
+              "company"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "surname": {
+            "type": "string"
+          },
+          "blockchainAddress": {
+            "type": "string"
+          },
+          "walletType": {
+            "type": "string",
+            "enum": [
+              "exchange",
+              "unhosted"
+            ]
+          },
+          "exchangeName": {
+            "type": "string"
+          },
+          "walletOwnership": {
+            "type": "string",
+            "enum": [
+              "own",
+              "other"
+            ]
+          }
+        }
+      },
+      "BlockchainManagerTravelRuleOrderResponseDto": {
+        "type": "object",
+        "required": [
+          "amount",
+          "rateToEur",
+          "orderCreatedAt",
+          "category",
+          "origin",
+          "destination"
+        ],
+        "properties": {
+          "amount": {
+            "$ref": "#/components/schemas/BlockchainManagerAmount"
+          },
+          "rateToEur": {
+            "type": "string",
+            "example": "0.042"
+          },
+          "transactionHash": {
+            "type": "string"
+          },
+          "orderCreatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "orderCompleteAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "blockchain-deposit",
+              "blockchain-withdrawal",
+              "pay",
+              "transfer"
+            ]
+          },
+          "origin": {
+            "$ref": "#/components/schemas/TravelRuleOrderOrigin"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/TravelRuleOrderDestination"
+          }
+        }
+      },
+      "CompleteTravelRuleOrderRequestDto": {
+        "type": "object",
+        "required": [
+          "walletType",
+          "walletOwnership"
+        ],
+        "properties": {
+          "walletType": {
+            "type": "string",
+            "description": "Wallet type the funds are sent to",
+            "enum": [
+              "exchange",
+              "unhosted"
+            ]
+          },
+          "exchangeName": {
+            "type": "string",
+            "description": "Exchange name when walletType is exchange",
+            "example": "Exchange Name"
+          },
+          "walletOwnership": {
+            "type": "string",
+            "description": "Whether the destination address is owned by the user or by someone else",
+            "enum": [
+              "own",
+              "other"
+            ]
+          },
+          "personType": {
+            "type": "string",
+            "description": "Whether the beneficiary is a person or a company",
+            "enum": [
+              "person",
+              "company"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "Beneficiary person name or company name",
+            "example": "John"
+          },
+          "surname": {
+            "type": "string",
+            "description": "Beneficiary person surname",
+            "example": "Doe"
+          },
+          "document": {
+            "type": "object",
+            "required": [
+              "countryCode",
+              "number",
+              "type"
+            ],
+            "properties": {
+              "countryCode": {
+                "type": "string",
+                "pattern": "^[A-Z]{2}$",
+                "example": "ES"
+              },
+              "number": {
+                "type": "string",
+                "example": "12345678A"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "cif",
+                  "foreign-id-card",
+                  "idcard",
+                  "passport"
+                ]
+              }
+            }
+          },
+          "address": {
+            "type": "object",
+            "required": [
+              "countryCode",
+              "city",
+              "street",
+              "zip"
+            ],
+            "properties": {
+              "countryCode": {
+                "type": "string",
+                "pattern": "^[A-Z]{2}$",
+                "example": "ES"
+              },
+              "city": {
+                "type": "string",
+                "example": "City Name"
+              },
+              "street": {
+                "type": "string",
+                "example": "Street address"
+              },
+              "zip": {
+                "type": "string",
+                "example": "80080"
+              }
+            }
+          },
+          "placeOfBirth": {
+            "type": "object",
+            "required": [
+              "countryCode",
+              "city"
+            ],
+            "properties": {
+              "countryCode": {
+                "type": "string",
+                "pattern": "^[A-Z]{2}$",
+                "example": "ES"
+              },
+              "city": {
+                "type": "string",
+                "example": "City Name"
+              }
+            }
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date-time",
+            "example": "1990-01-15T00:00:00.000Z"
+          }
+        }
+      },
+      "CompleteTravelRuleOrderV2RequestDto": {
+        "type": "object",
+        "required": [
+          "walletType",
+          "walletOwnership"
+        ],
+        "properties": {
+          "walletType": {
+            "type": "string",
+            "enum": [
+              "exchange",
+              "unhosted"
+            ]
+          },
+          "exchangeName": {
+            "type": "string",
+            "example": "Exchange Name"
+          },
+          "walletOwnership": {
+            "type": "string",
+            "enum": [
+              "own",
+              "other"
+            ]
+          },
+          "personType": {
+            "type": "string",
+            "enum": [
+              "person",
+              "company"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "example": "John"
+          },
+          "surname": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "address": {
+            "type": "object",
+            "required": [
+              "countryCode"
+            ],
+            "properties": {
+              "countryCode": {
+                "type": "string",
+                "pattern": "^[A-Z]{2}$"
+              }
+            }
+          }
+        }
+      },
+      "WithdrawalDraftAmountDto": {
+        "type": "object",
+        "required": [
+          "value",
+          "currency"
+        ],
+        "properties": {
+          "value": {
+            "type": "string",
+            "example": "0.5"
+          },
+          "currency": {
+            "type": "string",
+            "example": "BTC"
+          }
+        }
+      },
+      "WithdrawalDraftDenominationResponseDto": {
+        "type": "object",
+        "required": [
+          "amount",
+          "currency",
+          "price"
+        ],
+        "properties": {
+          "amount": {
+            "type": "string",
+            "example": "100"
+          },
+          "currency": {
+            "type": "string",
+            "example": "EUR"
+          },
+          "price": {
+            "type": "string",
+            "example": "95000"
+          }
+        }
+      },
+      "CreateWithdrawalDraftRequestDto": {
+        "type": "object",
+        "required": [
+          "amount",
+          "addressBookId"
+        ],
+        "properties": {
+          "amount": {
+            "$ref": "#/components/schemas/WithdrawalDraftAmountDto"
+          },
+          "addressBookId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          }
+        }
+      },
+      "CreateWithdrawalDraftResponseDto": {
+        "type": "object",
+        "required": [
+          "draftId",
+          "expiresAt",
+          "addressBookId",
+          "walletPocketId",
+          "amount",
+          "networkFee",
+          "totalAmount",
+          "currency",
+          "network",
+          "destinationAddress",
+          "denomination"
+        ],
+        "properties": {
+          "draftId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "addressBookId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "walletPocketId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amount": {
+            "type": "string",
+            "example": "0.5"
+          },
+          "networkFee": {
+            "type": "string",
+            "example": "0.0001"
+          },
+          "totalAmount": {
+            "type": "string",
+            "example": "0.5001"
+          },
+          "currency": {
+            "type": "string",
+            "example": "BTC"
+          },
+          "network": {
+            "type": "string",
+            "example": "bitcoin"
+          },
+          "destinationAddress": {
+            "type": "string"
+          },
+          "tag": {
+            "type": "string",
+            "nullable": true
+          },
+          "denomination": {
+            "$ref": "#/components/schemas/WithdrawalDraftDenominationResponseDto"
+          }
+        }
+      },
+      "AcceptWithdrawalDraftRequestDto": {
+        "type": "object",
+        "required": [
+          "draftId"
+        ],
+        "properties": {
+          "draftId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          }
+        }
+      },
+      "AcceptWithdrawalDraftResponseDto": {
+        "type": "object",
+        "required": [
+          "orderId",
+          "type",
+          "status",
+          "amount",
+          "currency",
+          "network",
+          "destinationAddress",
+          "chargedFee",
+          "chargedFeeCurrency",
+          "walletPocketId",
+          "userId",
+          "createdAt"
+        ],
+        "properties": {
+          "orderId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "deposit",
+              "withdrawal"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "completed",
+              "created",
+              "canceled",
+              "error",
+              "pending-user-information",
+              "pending-risk-analysis",
+              "pending-review",
+              "pending-verification",
+              "processing",
+              "rejected",
+              "reviewing"
+            ]
+          },
+          "amount": {
+            "type": "string",
+            "example": "1.5"
+          },
+          "currency": {
+            "type": "string",
+            "example": "BTC"
+          },
+          "network": {
+            "type": "string",
+            "example": "bitcoin"
+          },
+          "destinationAddress": {
+            "type": "string"
+          },
+          "tag": {
+            "type": "string",
+            "nullable": true
+          },
+          "chargedFee": {
+            "type": "string",
+            "example": "0.0001"
+          },
+          "chargedFeeCurrency": {
+            "type": "string",
+            "example": "BTC"
+          },
+          "walletPocketId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "StableCoinsWithdrawalPhoneSfaChannelParam": {
+        "type": "string",
+        "enum": [
+          "sms",
+          "whatsapp"
+        ],
+        "description": "Phone OTP channel allowed for stablecoin withdrawal SFA"
+      },
+      "StablecoinWithdrawalSfaRequiredResponseDto": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "2FA TOTP is required"
+          },
+          "sfaProcessInitialized": {
+            "type": "boolean",
+            "example": true
+          },
+          "sfaType": {
+            "$ref": "#/components/schemas/TotpTypeParam"
+          },
+          "retryIntervalSeconds": {
+            "type": "integer",
+            "description": "Seconds before the same phone channel can be retried"
+          },
+          "availableChannels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StableCoinsWithdrawalPhoneSfaChannelParam"
+            }
+          },
+          "defaultChannel": {
+            "$ref": "#/components/schemas/StableCoinsWithdrawalPhoneSfaChannelParam"
+          }
+        }
+      }
+    }
+  }
+}

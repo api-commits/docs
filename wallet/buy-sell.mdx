@@ -1,0 +1,64 @@
+---
+title: "Buy, sell, and swap"
+description: "Wallet proforma then execute for buy, sell, and pocket-to-pocket moves."
+---
+
+Wallet conversion uses a **proforma** (quote) and a separate **execute** call. No funds move until you confirm the proforma.
+
+<Info>
+Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com).
+</Info>
+
+## Buy (fiat pocket → crypto pocket)
+
+```http
+POST /v1/wallet/transaction/proforma
+```
+
+Example: buy BTC with 100 EUR on a subaccount.
+
+```json
+{
+  "pocket": "<EUR pocket UUID>",
+  "destination": { "pocket": "<BTC pocket UUID>" },
+  "amount": "100",
+  "currency": "EUR"
+}
+```
+
+Send `X-SUBACCOUNT-ID` for end-user wallets.
+
+## Sell (crypto pocket → fiat pocket)
+
+Swap the pockets and set `amount` / `currency` to the crypto you are selling.
+
+```json
+{
+  "pocket": "<BTC pocket UUID>",
+  "destination": { "pocket": "<EUR pocket UUID>" },
+  "amount": "0.1",
+  "currency": "BTC"
+}
+```
+
+## Execute
+
+```http
+POST /v1/wallet/transaction
+```
+
+```json
+{
+  "proforma": "<proforma id>"
+}
+```
+
+Execute before `expirationTime` on the proforma. Some operations require `x-totp` and `x-totp-type`. For subaccounts, `x-totp-type` is always `gauth`.
+
+## Listen for settlement
+
+Prefer WebSocket `wallet-transaction-v1` over tight polling. See [Notifications](/wallet/websocket).
+
+<Note>
+Pro Trading uses a different order model (`POST /v1/trading/order`). Do not mix Wallet pair strings with Pro symbols on the same call. MCP tools often use `BTC-EUR`; Wallet examples in OpenAPI use pocket IDs.
+</Note>

@@ -1,0 +1,24 @@
+---
+title: "Wallet REST overview"
+description: "How to use the generated Wallet OpenAPI reference on this site."
+---
+
+The **REST** tab is generated from a snapshot of `openapi/crypto.json` (91 operations). Server: `https://gateway.bit2me.com`.
+
+Scalar grouping is preserved by OpenAPI tags: Access, Account, KYC, Wallet, Funding, Transfers, Earn, Pro (Trading Spot), Compliance, plus related tags in the full gateway spec.
+
+## Playground
+
+Private endpoints require HMAC (`x-api-key`, `api-signature`, `x-nonce`). Mintlify cannot compute that signature. The playground is **simple** (copy the request, sign locally). See [Authentication](/guides/authentication).
+
+Public market helpers on the Wallet spec still need the same client discipline: never paste secrets into the browser.
+
+## Samples
+
+Many operations already ship `x-codeSamples` (Node and curl) from the public spec. Official Pro samples: [trading-spot-samples](https://github.com/bit2me-devs/trading-spot-samples).
+
+The older `bit2me-api-node-tool` repository is discontinued. Cite it only as a historical HMAC helper, not as an SDK.
+
+## Current Scalar site
+
+Until cutover, the live Scalar catalog remains [api.bit2me.com/doc](https://api.bit2me.com/doc).

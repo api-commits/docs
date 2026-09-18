@@ -1,0 +1,45 @@
+---
+title: "Partner overview"
+description: "B2B2C journeys: onboard end users, fund fiat, exchange, and withdraw crypto."
+---
+
+Use the Partner product when you distribute Bit2Me to **your** customers. You hold parent API keys. Each end user is one subaccount.
+
+<Warning>
+This page describes the published API. It is not legal advice. Bit2Me Legal and Compliance must review KYC, KYB, Travel Rule, and 2FA copy before this portal is announced to partners.
+</Warning>
+
+## Journeys
+
+<Columns cols={2}>
+  <Card title="KYC (natural person)" href="/partner/kyc">
+    Eight steps to `verified` and `tier: 2`. Hosted ID + liveness only.
+  </Card>
+  <Card title="KYB (company)" href="/partner/kyb">
+    Company subaccount and document pack. No identity webview.
+  </Card>
+  <Card title="Widgets" href="/partner/widgets">
+    Identity in a native browser. Add card in a WebView.
+  </Card>
+  <Card title="Funding" href="/partner/fiat">
+    Bank, card, Apple Pay, Google Pay, PIX via Teller / Paylands.
+  </Card>
+  <Card title="Withdrawals" href="/partner/withdrawals-address-book">
+    Address book (target path) and Wallet legacy (still live).
+  </Card>
+  <Card title="Transfers" href="/partner/transfers">
+    Social Pay vs pocket transfer — two rails.
+  </Card>
+</Columns>
+
+## Rules that prevent tickets
+
+- One end user = one subaccount. Send `X-SUBACCOUNT-ID` after create.
+- Do not treat the user as live until KYC `status: verified` and `tier: 2` (persons).
+- Do not call identity init on `type: company`.
+- Travel Rule only when the order/transaction status asks for user information.
+- Apple Pay must leave the in-app WebView.
+
+<Info>
+Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com).
+</Info>

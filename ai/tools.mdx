@@ -1,0 +1,68 @@
+---
+title: "MCP tool catalog"
+description: "48 tools grouped by category, from bit2me-devs/bit2me-mcp."
+---
+
+Responses use `request`, `result`, and `metadata` keys. Irreversible writes return a `needs_confirmation` preview unless `confirm` is boolean `true` (broker quote tools do not require confirm). Optional `BIT2ME_ENABLED_CATEGORIES` allow-list: `general`, `broker`, `wallet`, `pro`, `earn`, `loan`.
+
+Source of truth: [data/tools.json](https://github.com/bit2me-devs/bit2me-mcp/blob/main/data/tools.json).
+
+## General
+
+| Tool | Use |
+| --- | --- |
+| `general_get_assets_config` | Asset configuration |
+| `portfolio_get_valuation` | Wallet + Pro + Earn aggregate |
+| `general_health` | Local MCP process health |
+| `general_describe_tool` | Schema and examples for an enabled tool |
+
+## Broker
+
+| Tool | Use |
+| --- | --- |
+| `broker_get_asset_price` | Wallet rates |
+| `broker_get_asset_data` | Ticker |
+| `broker_get_asset_chart` | Candles (`pair` like `BTC-EUR`) |
+| `broker_quote_buy` | Buy proforma |
+| `broker_quote_sell` | Sell proforma |
+| `broker_quote_swap` | Swap proforma |
+| `broker_confirm_quote` | Execute proforma (confirm flag) |
+| `wallet_get_cards` | Listed cards (Teller; lives in broker allow-list) |
+
+## Wallet
+
+| Tool | Use |
+| --- | --- |
+| `wallet_get_pockets` | Simple Wallet balances |
+| `wallet_get_pocket_addresses` | Deposit addresses |
+| `wallet_get_networks` | Networks for a currency |
+| `wallet_get_movements` | Wallet history |
+
+Does **not** include external withdrawals.
+
+## Pro
+
+| Tool | Use |
+| --- | --- |
+| `pro_get_balance` | Pro balances (not Simple Wallet) |
+| `pro_get_open_orders` | Open orders |
+| `pro_get_trades` | Your trades |
+| `pro_get_order_trades` | Fills for one order |
+| `pro_create_order` | Limit / market / stop |
+| `pro_cancel_order` | Cancel one |
+| `pro_cancel_all_orders` | Cancel all (optional pair) |
+| `pro_deposit` | Wallet → Pro |
+| `pro_withdraw` | Pro → Wallet |
+| `pro_get_market_config` | Precision and limits |
+| `pro_get_order_book` | Depth |
+| `pro_get_public_trades` | Public prints |
+| `pro_get_candles` | OHLCV |
+| `pro_get_ticker` | Ticker |
+
+## Earn
+
+`earn_get_summary`, `earn_get_positions`, `earn_get_position_movements`, `earn_get_movements`, `earn_get_movements_summary`, `earn_get_rewards_config`, `earn_get_position_rewards_config`, `earn_get_position_rewards_summary`, `earn_deposit`, `earn_withdraw`, `earn_get_assets`.
+
+## Loans
+
+`loan_get_simulation`, `loan_get_config`, `loan_get_movements`, `loan_get_orders`, `loan_create`, `loan_increase_guarantee`, `loan_payback`.

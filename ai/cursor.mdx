@@ -1,0 +1,32 @@
+---
+title: "Cursor setup"
+description: "Add @bit2me/mcp-server to Cursor MCP settings."
+---
+
+<Steps>
+  <Step title="Create API keys">
+    [Get API keys](https://account.bit2me.com/api-keys). Skip Withdraw.
+  </Step>
+  <Step title="Add the server">
+    Settings → MCP → add a server named `bit2me` with command:
+
+    ```bash
+    npx -y @bit2me/mcp-server
+    ```
+  </Step>
+  <Step title="Put keys where Cursor can read them">
+    Cursor UI may not accept `env` for MCP. Create a `.env` in the project root:
+
+    ```bash
+    BIT2ME_API_KEY=your_api_key_here
+    BIT2ME_API_SECRET=your_api_secret_here
+    ```
+
+    `chmod 600 .env`. Never commit it.
+  </Step>
+  <Step title="Smoke-test">
+    Ask the agent to run `general_health` or `broker_get_asset_data` with `base_symbol: BTC`, `quote_symbol: EUR`.
+  </Step>
+</Steps>
+
+MCP tools use `BASE-QUOTE` (for example `BTC-EUR`). Pro REST uses `BTC/EUR`. Do not mix formats on the same call.

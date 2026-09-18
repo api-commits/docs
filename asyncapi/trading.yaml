@@ -1,0 +1,136 @@
+asyncapi: '2.6.0'
+info:
+  title: Bit2Me Pro Trading WebSocket
+  version: '1.0.0'
+  description: |
+    Spot WebSocket at `wss://ws.bit2me.com/v1/trading`.
+    Public channels do not require authentication.
+    Private channels require a token from `POST /v1/signin/apikey` (1 minute TTL)
+    and an `authenticate` event.
+  contact:
+    name: Bit2Me Support
+    url: https://support.bit2me.com
+servers:
+  production:
+    url: wss://ws.bit2me.com/v1/trading
+    protocol: wss
+    description: Pro Trading Spot WebSocket
+channels:
+  order-book:
+    description: Level 2 order book. Subscribe with event subscribe and subscription.name order-book.
+    subscribe:
+      summary: Order book updates
+      message:
+        name: orderBook
+        payload:
+          type: object
+          properties:
+            event:
+              type: string
+              example: order-book
+            symbol:
+              type: string
+              example: B2M/EUR
+            data:
+              type: object
+              properties:
+                bids:
+                  type: array
+                asks:
+                  type: array
+                nonce:
+                  type: number
+  public-trades:
+    description: Public last trades for a symbol.
+    subscribe:
+      summary: Public trades
+      message:
+        name: publicTrades
+        payload:
+          type: object
+          properties:
+            event:
+              type: string
+              example: public-trades
+            symbol:
+              type: string
+            data:
+              type: object
+              properties:
+                side:
+                  type: string
+                price:
+                  type: number
+                amount:
+                  type: number
+                timestamp:
+                  type: number
+  my-trades:
+    description: Your fills. Authentication required.
+    subscribe:
+      summary: Private trades
+      message:
+        name: myTrades
+        payload:
+          type: object
+          properties:
+            event:
+              type: string
+              example: my-trades
+            symbol:
+              type: string
+            data:
+              type: object
+  my-orders:
+    description: Your order updates. Authentication required.
+    subscribe:
+      summary: Private orders
+      message:
+        name: myOrders
+        payload:
+          type: object
+          properties:
+            event:
+              type: string
+              example: my-orders
+            data:
+              type: object
+  executions:
+    description: Combined my-orders and my-trades stream. Authentication required.
+    subscribe:
+      summary: Executions
+      message:
+        name: executions
+        payload:
+          type: object
+  my-balance:
+    description: Balance changes. Authentication required.
+    subscribe:
+      summary: Private balances
+      message:
+        name: myBalance
+        payload:
+          type: object
+  my-working-capital:
+    description: Working capital limit changes. Authentication required.
+    subscribe:
+      summary: Working capital
+      message:
+        name: myWorkingCapital
+        payload:
+          type: object
+  authenticate:
+    description: Send event authenticate with token from POST /v1/signin/apikey within 1 minute.
+    publish:
+      summary: Authenticate
+      message:
+        name: authenticate
+        payload:
+          type: object
+          required: [event, token]
+          properties:
+            event:
+              type: string
+              example: authenticate
+            token:
+              type: string

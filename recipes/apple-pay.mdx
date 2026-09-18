@@ -1,0 +1,16 @@
+---
+title: "Apple Pay button missing"
+description: "Open Paylands in Safari — never in a WebView or iframe."
+---
+
+`POST /v1/teller/order/proforma` with `method: "apple-pay"` returning **200** only means the session exists.
+
+Apple does not show Apple Pay inside WebViews or iframes. Open `data.provider.requestConfiguration.uri` in **Safari / the system browser**. Google Pay and cards may use an in-app WebView.
+
+If the button is missing **even in Safari**, inspect whether `apple_pay.js` loads on Paylands. That is a checkout-template issue, not your HMAC.
+
+Full guide: [Apple Pay and Google Pay](/partner/apple-google-pay).
+
+<Info>
+Check [status.bit2me.com](https://status.bit2me.com) before opening a ticket. If this persists, [open a support ticket](https://support.bit2me.com).
+</Info>

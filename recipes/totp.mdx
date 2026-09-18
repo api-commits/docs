@@ -1,0 +1,23 @@
+---
+title: "2FA 420 and 428"
+description: "gauth for subaccounts; 428 means TOTP is required."
+---
+
+<Warning>
+Bit2Me Legal and Compliance must review 2FA copy before partner go-live. This page is operational, not legal advice.
+</Warning>
+
+| Status | Meaning |
+| --- | --- |
+| **420** | Invalid code |
+| **428** | 2FA required (including some stablecoin withdrawals) |
+
+Headers: `x-totp` (6 digits) and `x-totp-type`. For **subaccounts**, type is always `gauth` (not SMS or email).
+
+Enroll subaccount 2FA with `POST /v1/account/subaccount/sfa` then `PUT /v1/account/subaccount/sfa`. Parent path `POST /v1/account/settings/sfa` is a different account.
+
+Fresh codes only. Clock skew on the authenticator causes 420.
+
+<Info>
+Check [status.bit2me.com](https://status.bit2me.com) before opening a ticket. If this persists, [open a support ticket](https://support.bit2me.com).
+</Info>

@@ -1,0 +1,21 @@
+---
+title: "Pro REST overview"
+description: "Market data, trading, funding, and WebSocket token from trading-spot-rest.json."
+---
+
+Snapshot: `openapi/trading-spot-rest.json` (17 operations). Server: `https://gateway.bit2me.com`.
+
+| Tag | What you get |
+| --- | --- |
+| MarketData | Markets, candles, order book, tickers, last trades (no API key) |
+| Trading | Add / get / cancel orders and trades |
+| Funding | Balance, working capital, deposit, withdraw, movements |
+| WsAuth | `POST /v1/signin/apikey` — token for Pro WS (**1 minute** TTL) |
+
+## Playground
+
+Market data is unsigned, but this site still uses a **simple** playground so signed examples cannot silently fail HMAC in the browser. Copy, sign locally, send from your backend.
+
+`x-codeSamples` on each operation point at [https://github.com/bit2me-devs/trading-spot-samples](https://github.com/bit2me-devs/trading-spot-samples).
+
+Pro deposit/withdraw here move funds between **Wallet and Pro**, not to an external chain. External crypto out is [address book](/partner/withdrawals-address-book) or [Wallet legacy](/partner/withdrawals-wallet).

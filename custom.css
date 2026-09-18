@@ -1,0 +1,10 @@
+img.nav-logo {
+  height: 1.75rem !important;
+  width: auto !important;
+}
+
+a[href="https://mintlify.com"],
+a[href="https://mintlify.com/docs"],
+a[href="https://dashboard.mintlify.com"] {
+  display: none !important;
+}

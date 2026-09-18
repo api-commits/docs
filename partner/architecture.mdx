@@ -1,0 +1,51 @@
+---
+title: "Partner architecture"
+description: "Parent HMAC, subaccount sessions, and the money path for B2B2C."
+---
+
+Genericize this map for any bank or neobroker. Do not copy a single partner's contract.
+
+```mermaid
+sequenceDiagram
+  participant U as End user
+  participant A as Your app
+  participant B as Your backend
+  participant G as Bit2Me gateway
+  Note over B,G: Parent KYB already complete
+  U->>A: Sign up / buy crypto
+  A->>B: Create or resolve user
+  B->>G: POST /v1/account/subaccount
+  G-->>B: userId
+  B->>G: KYC or KYB steps
+  B->>G: POST /v3/account/verify/identity/init (persons only)
+  G-->>B: redirectUrl
+  A->>U: Native browser — ID + liveness
+  G-->>B: WS identity.validated
+  U->>A: Pay fiat
+  B->>G: Teller proforma
+  G-->>B: WS teller-order-v1
+  B->>G: Wallet buy proforma + execute
+  B->>G: Crypto withdraw (address book or Wallet)
+  Note over B,G: Travel Rule only if pending user information
+```
+
+## Auth layers
+
+| Layer | Mechanism | Used for |
+| --- | --- | --- |
+| Parent HMAC | `x-api-key`, `api-signature`, `x-nonce` | Create subaccount, server-side treasury |
+| Subaccount header | `X-SUBACCOUNT-ID: {userId}` | User-scoped REST |
+| Subaccount session | `POST /v1/signin/apikey` with `userId` | Embed widgets, some identity init contracts |
+| 2FA | `x-totp` + `x-totp-type: gauth` | Withdrawals and other protected ops |
+
+## Money path
+
+1. Fiat arrives on Bit2Me rails (bank, card, wallet pay).
+2. Crypto is bought into **subaccount pockets**.
+3. Delivery to the user is an **on-chain withdrawal** to an external address — not a second custodial wallet you invent.
+
+Keep your own ledger of fiat allocated per subaccount. A minimum parent fiat balance can be part of initial setup. USD on Wallet is not documented as generally available.
+
+<Warning>
+This page describes the published API. It is not legal advice. Bit2Me Legal and Compliance must review KYC, KYB, Travel Rule, and 2FA copy before this portal is announced to partners.
+</Warning>

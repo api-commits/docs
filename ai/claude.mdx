@@ -1,0 +1,33 @@
+---
+title: "Claude Desktop setup"
+description: "Register bit2me in claude_desktop_config.json."
+---
+
+macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "bit2me": {
+      "command": "npx",
+      "args": ["-y", "@bit2me/mcp-server"],
+      "env": {
+        "BIT2ME_API_KEY": "YOUR_BIT2ME_ACCOUNT_API_KEY",
+        "BIT2ME_API_SECRET": "YOUR_BIT2ME_ACCOUNT_API_SECRET"
+      }
+    }
+  }
+}
+```
+
+Restart Claude Desktop. Test with MCP Inspector:
+
+```bash
+export BIT2ME_API_KEY=YOUR_BIT2ME_ACCOUNT_API_KEY
+export BIT2ME_API_SECRET=YOUR_BIT2ME_ACCOUNT_API_SECRET
+npx @modelcontextprotocol/inspector npx -y @bit2me/mcp-server
+```
+
+Same package works with Windsurf, Gemini CLI, and other MCP clients. See [mcp.bit2me.com](https://mcp.bit2me.com).

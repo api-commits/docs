@@ -1,0 +1,122 @@
+---
+title: "Authentication"
+description: "HMAC-SHA512, nonce, subaccount header, and TOTP for the Bit2Me gateway."
+keywords: ["HMAC", "api-signature", "x-nonce", "x-totp"]
+---
+
+Private endpoints on `https://gateway.bit2me.com` require an API key and an HMAC signature. Never share a key. If you suspect a leak, revoke it immediately.
+
+<Warning>
+If requests fail with 401, sync the machine clock with NTP first. The documented nonce window is 5 seconds. Check [status.bit2me.com](https://status.bit2me.com) before you assume a platform outage. If this persists, [open a support ticket](https://support.bit2me.com).
+</Warning>
+
+## Headers
+
+| Header | Required | Description |
+| --- | --- | --- |
+| `x-api-key` / `X-API-KEY` | Yes (private) | Public API key |
+| `x-nonce` | Yes (signed) | Unix timestamp. Valid window: **5 seconds** |
+| `api-signature` | Yes (signed) | HMAC described below |
+| `X-SUBACCOUNT-ID` | When acting for an end user | Subaccount `userId` |
+| `x-totp` | Sensitive operations | 6-digit 2FA code |
+| `x-totp-type` | With `x-totp` | `gauth`, `sms`, or `email`. **Always `gauth` for subaccounts** |
+
+Validate the server TLS certificate and abort if validation fails.
+
+## HMAC algorithm
+
+1. Build the message:
+   - No body: `{nonce}:{path}`
+   - JSON body: `{nonce}:{path}:{JSON.stringify(body)}`
+2. SHA-256 the message (binary digest).
+3. HMAC-SHA512 using your **secret**, over that digest.
+4. Base64-encode the HMAC. That value is `api-signature`.
+
+The body used to sign **must** be the exact request body string. In JavaScript that is `JSON.stringify(body)`.
+
+<CodeGroup>
+```javascript Node.js
+const crypto = require("crypto");
+
+function getClientMessageToSign(nonce, url, body) {
+  const hasBody = !!body;
+  return hasBody ? `${nonce}:${url}:${JSON.stringify(body)}` : `${nonce}:${url}`;
+}
+
+function getMessageSignature(message, secret) {
+  const hashDigest = crypto.createHash("sha256").update(message).digest("binary");
+  return crypto.createHmac("sha512", secret).update(hashDigest, "binary").digest("base64");
+}
+
+const nonce = Date.now();
+const path = "/v1/trading/wallet/balance";
+const signature = getMessageSignature(getClientMessageToSign(nonce, path), process.env.BIT2ME_API_SECRET);
+```
+
+```python Python
+import hashlib, hmac, json, base64
+
+def sign(nonce: str, path: str, secret: str, body=None) -> str:
+    if body is None:
+        message = f"{nonce}:{path}".encode()
+    else:
+        message = f"{nonce}:{path}:{json.dumps(body)}".encode()
+    digest = hashlib.sha256(message).digest()
+    return base64.b64encode(hmac.new(secret.encode(), digest, hashlib.sha512).digest()).decode()
+```
+
+```bash cURL
+# Replace SIGNATURE after computing HMAC locally.
+curl -sS "https://gateway.bit2me.com/v1/trading/wallet/balance" \
+  -H "x-api-key: $BIT2ME_API_KEY" \
+  -H "api-signature: $SIGNATURE" \
+  -H "x-nonce: $NONCE"
+```
+</CodeGroup>
+
+Official Node samples for REST and WebSocket signing: [bit2me-devs/trading-spot-samples](https://github.com/bit2me-devs/trading-spot-samples) (`node/auth`). The older `bit2me-api-node-tool` repository is **discontinued** — do not treat it as an SDK.
+
+## Known-answer fixture
+
+Use this to unit-test your signer. If your output does not match, fix concatenation or encoding before you hit production.
+
+| Field | Value |
+| --- | --- |
+| Secret | `example_secret_do_not_use_in_production` |
+| Nonce | `1687155308` |
+| Path | `/v1/trading/wallet/balance` |
+| Body | _(none)_ |
+| Message | `1687155308:/v1/trading/wallet/balance` |
+| `api-signature` | `IgazRn9MPHcJjAfhrVHzI46U9iIDb7qbXYcTIN+9vrktJ6M4rET7WH+wasF+/8Thp9tzjkWaFCL8ASSzlY4D8g==` |
+
+POST example (default `JSON.stringify` spacing):
+
+| Field | Value |
+| --- | --- |
+| Path | `/v1/trading/order` |
+| Body | `{"side": "buy", "symbol": "BTC/EUR", "price": "50000", "amount": "0.01", "orderType": "limit"}` |
+| Message | `1687155308:/v1/trading/order:{"side": "buy", "symbol": "BTC/EUR", "price": "50000", "amount": "0.01", "orderType": "limit"}` |
+| `api-signature` | `s4b8cCvUI4S7GBBrf7v8FvBYqDZYeTLCJ63fzuc7dxcj/2JH2eR+jihgmgF4KFj6jxj2v/nglmOkQQu0fNUCkQ==` |
+
+## TOTP
+
+Some operations require 2FA:
+
+- `x-totp` — code
+- `x-totp-type` — `gauth` \| `sms` \| `email`
+
+For **subaccount** operations, `x-totp-type` is always `gauth`.
+
+## Playground
+
+Mintlify cannot compute this HMAC in the interactive playground. REST pages on this site use **copyable** examples. Sign locally, then send the request from your backend.
+
+## Key scopes
+
+When you create a key you can request:
+
+- **Read**
+- **Trade** — create or cancel orders
+- **Withdraw** — withdrawals that bypass two-factor authentication
+
+Prefer IP allowlists on Trade and Withdraw keys.

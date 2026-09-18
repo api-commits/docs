@@ -1,0 +1,41 @@
+---
+title: "Errors"
+description: "HTTP statuses you will see on the Bit2Me API and how to react."
+keywords: ["401", "429", "420", "428", "errors"]
+---
+
+Use this page as a cookbook. Confirm the exact body in your logs. Do not invent error codes.
+
+<Info>
+Before you debug, check [status.bit2me.com](https://status.bit2me.com) (Auth, Wallet, Pro). If the platform is healthy and the error repeats, [open a support ticket](https://support.bit2me.com) with timestamp (UTC), path, HTTP status, and a redacted body.
+</Info>
+
+| Status | Typical cause | What to do |
+| --- | --- | --- |
+| **400** | Invalid or missing fields | Check types (amounts are often **strings**), required fields, pair format |
+| **401** | Bad HMAC, clock, or missing key | NTP sync; nonce window 5s; `x-api-key` + `api-signature` + `x-nonce`; no extra spaces in secrets |
+| **403** | Endpoint limited (for example some confirm routes are subaccount-only) | Confirm you send `X-SUBACCOUNT-ID` |
+| **406** | Business rule (for example a pocket limit in a specific product) | Treat as case-specific; do not publish a global numeric cap from one incident |
+| **412** | Insufficient funds | Check pocket/Pro balance including fees |
+| **417** | Amount too low or too high | Check market/min-max config |
+| **418** | API ban after abuse of rate limits | Stop traffic; contact support |
+| **420** | Invalid 2FA | Fresh `x-totp`; subaccounts use `x-totp-type: gauth` |
+| **423** | Operation blocked | Case-specific; do not generalize |
+| **428** | 2FA required (including some stablecoin withdrawals) | Send TOTP headers |
+| **429** | Rate limit | Back off. See [Rate limits](/guides/rate-limits) |
+| **500 / 502** | Server-side | Retry later; check status page |
+
+## Amounts and pairs
+
+- Use `.` for decimals, not `,` (`0.5` not `0,5`).
+- Prefer **strings** for amounts.
+- Pro pairs follow the market list from `GET /v1/trading/market-config`. Wallet pairs in examples use `BTC/EUR`. MCP tools may use `BTC-EUR` — do not mix formats on the same endpoint.
+
+## WebSocket close codes (notifications)
+
+| Code | Meaning |
+| --- | --- |
+| **4000** | Authentication failed |
+| **4001** | Message rate limit |
+
+Reconnect with backoff. See [Gateway WebSocket](/wallet/websocket).

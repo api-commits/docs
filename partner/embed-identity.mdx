@@ -1,0 +1,31 @@
+---
+title: "Identity widget"
+description: "Initialize KYC and open redirectUrl in a native browser."
+---
+
+<Warning>
+This page describes the published API. It is not legal advice. Bit2Me Legal and Compliance must review KYC, KYB, Travel Rule, and 2FA copy before this portal is announced to partners.
+</Warning>
+
+Natural-person subaccounts only. Not for `type: company`.
+
+<Steps>
+  <Step title="Initialize (server-side)">
+    ```http
+    POST https://gateway.bit2me.com/v3/account/verify/identity/init
+    ```
+    `locale` is required. Optional `workflowId` (default `10011`), `successUrl`, `errorUrl`.
+
+    Response includes `redirectUrl`, `token`, `reference`, `provider` (for example jumio).
+  </Step>
+  <Step title="Open the UI">
+    Open `redirectUrl` in a native system browser. The user captures ID and completes video liveness on Bit2Me infrastructure.
+  </Step>
+  <Step title="Detect completion">
+    REST `GET /v1/account/verify/identity`. WebSocket `identity.validated`. Success: `status: "verified"`, `tier: 2`.
+  </Step>
+</Steps>
+
+Embed OpenAPI does **not** publish a separate `embed.bit2me.com` identity URL comparable to add-card. Identity init + `redirectUrl` is the supported launch path.
+
+Optional files: `GET /v1/verifier/subaccount/file`.

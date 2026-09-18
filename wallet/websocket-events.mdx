@@ -1,0 +1,49 @@
+---
+title: "Notification events"
+description: "Gateway WebSocket types from the public Crypto OpenAPI."
+---
+
+Envelope fields: `channel`, `id`, `time`, `type`, `payload`. Use **`type`** as the contract key.
+
+Deprecated aliases still appear in the spec. Prefer `teller-order-v1` and `wallet-transaction-v1`.
+
+| Type | Payload (summary) | Description |
+| --- | --- | --- |
+| `file.download.error` | `message` | Error downloading a file. |
+| `file.download` | `path` | Receiving a file. |
+| `accouting.entries.success` | empty | Accounting document generation succeeded. Type spelling is from the spec. |
+| `accounting.entries.error` | `error.date`, `error.message` | Error generating an accounting document. |
+| `affiliate.activity` | action-dependent | Affiliate activity. |
+| `affiliate.invoice` | email, earnings, pocket fields | Affiliate invoice generated. |
+| `currency.rates` | `type`, `rates` (fiat or crypto) | Currency price changes. |
+| `instant.process.postponed.orders.finished` | empty | Postponed instant orders reprocessed. |
+| `social.payment.expiration` | amount, currency, user fields | Pending Social Pay expired. |
+| `social.payment.success` | `pocketId`, `amount`, `currency` | You received a payment. |
+| `social.payment.pending` | amount, currency, expiryDate | Pending Social Pay. |
+| `teller.new.card.success` | `cardId`, `alias` | Card added. |
+| `teller.new.card.error` | `code`, `message` | Failed to add a card. |
+| `teller.purchase.card.success` | pocket, amount, transactionId | Card purchase succeeded. |
+| `teller-order-v1` | `orderId`, `status`, `type`, `error` | Teller order update. Prefer this over deprecated teller events. |
+| `teller.deposit.transfer.success` | pocket, amount, transactionId | Bank transfer deposit received. |
+| `teller.deposit.transfer.error` | `code`, `message` | Bank transfer deposit error. |
+| `identity.pending` | langCode, email | Identity pending. |
+| `identity.validated` | langCode, email | Identity verified. |
+| `identity.rejected` | langCode, email | Identity rejected. |
+| `identity.nodata` | langCode, email | Identity without data. |
+| `identity.image.uploaded` | image document or selfie | Verification image uploaded. |
+| `identity.image.error` | image document or selfie | Verification image error. |
+| `identity.enhanced.measures.required` | langCode, email | Enhanced measures required. |
+| `email.confirm.done` | `email` | Email confirmed. |
+| `wallet-transaction-v1` | userId, pocketId, amount, currency, transactionId, status, tellerId | Wallet transaction. Prefer this over deprecated `teller.deposit.card.success`. |
+| `wallet.trx.received` | pocket, amount, transactionId | On-chain receive. |
+| `wallet.trx.confirmed` | pocket, amount, transactionId | On-chain send confirmed. |
+| `wallet.trx.reimbursement` | pocket, bankAccount, tellerOrderId | Refunded. |
+| `wallet.trx.cancellation` | pocket, bankAccount, tellerOrderId | Canceled. |
+| `loan-ltv-risk-v1` | orderId, percentage, riskType | Loan at risk (`medium` or `high`). |
+| `loan-liquidated-v1` | orderId, status, ltv | Loan liquidated. |
+
+Deprecated (do not build new listeners): `teller.purchase.card.error`, `teller.deposit.card.success`, `teller.deposit.card.error`, `notice.unverified.card`, `launchpad.purchase.card.error`. Use `teller-order-v1` or `wallet-transaction-v1` as the spec indicates.
+
+Launchpad purchase success and error types exist on the spec for card and EUR-pocket checkout. Treat them as catalog entries, not a separate product guide.
+
+The explorer sample in OpenAPI (`/v1/explorer/BTCTEST`) is a placeholder snippet — not a documented production hostname.

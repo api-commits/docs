@@ -1,0 +1,53 @@
+---
+title: "Gateway notifications"
+description: "Authenticate with JWT or API key, reconnect, and consume the notification contract."
+---
+
+The gateway WebSocket pushes **notifications** for a logged-in account (wallet, teller, identity, loans). It is not the Pro trading socket.
+
+<Info>
+Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com).
+</Info>
+
+## Connection
+
+The public OpenAPI samples use a placeholder host (`wss://HOST:PORT/`). Use the host your integration manager or live Scalar session provides. Do not guess a hostname.
+
+After connect, authenticate:
+
+```json
+{ "type": "authenticate", "payload": { "token": "<jwt>" } }
+```
+
+or
+
+```json
+{ "type": "authenticate", "payload": { "apikey": ["<api-key>"] } }
+```
+
+If authentication fails, the server closes with code **4000**.
+
+## Limits (same family as HTTP)
+
+| Condition | Result |
+| --- | --- |
+| More than **50** concurrent connections from one IP | Handshake **429** |
+| More than **50 messages per second** on one connection | Close **4001** |
+
+You can **only** receive events with a logged-in account.
+
+## Reconnect
+
+Implement `on disconnect: reconnect` with backoff. Check [status.bit2me.com](https://status.bit2me.com) if reconnect loops during an incident.
+
+## Message envelope
+
+Every notification has the same shape:
+
+```
+{ channel: string, id: string, time: number, type: string, payload: object }
+```
+
+`payload` depends on `type`. The **notification** channel is the public contract. Do not treat `internal` (if you see it) as a stable API.
+
+Event catalog: [Notification events](/wallet/websocket-events).

@@ -1,0 +1,12 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Bit2Me API Money Flow",
+    "description": "# Money Flow\nResources to understand the flow money in the different transaction types.\n\n## Trading money flows\n<figure>\n\n  ![Trading money flows](images/trading-money-flows.svg)\n\n  <figcaption><b>Fig. - Trading money flows</b></figcaption>\n</figure>\n\n\n## Earn money flows A - End users\n<figure>\n\n  ![Earn money flows A - End users](images/earn-money-flows-a-end-users.svg)\n\n  <figcaption><b>Fig. - Earn money flows A - End users</b></figcaption>\n</figure>\n"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {}
+  }
+}

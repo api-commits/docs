@@ -1,0 +1,16 @@
+---
+title: "Missing subaccount header"
+description: "Empty balances and parent-scoped calls when X-SUBACCOUNT-ID is omitted."
+---
+
+After `POST /v1/account/subaccount`, every end-user call needs:
+
+```http
+X-SUBACCOUNT-ID: {userId}
+```
+
+If you omit it, you operate the **parent**. Symptoms: empty pockets, KYC status that does not match the user, withdrawals on the wrong wallet.
+
+Store `userId` (UUID) in your database. Do not send a partner-internal user id.
+
+Related: [Account model](/guides/account-model).

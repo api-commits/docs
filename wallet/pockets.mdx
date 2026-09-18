@@ -1,0 +1,41 @@
+---
+title: "Pockets"
+description: "Create and list currency pockets under a parent or subaccount wallet."
+---
+
+A pocket is an optional sub-ledger per currency (EUR, BTC, ETH, and others). You can also operate at wallet level.
+
+Every call for an end user must include `X-SUBACCOUNT-ID` after you create the subaccount. See [Account model](/guides/account-model).
+
+## List pockets
+
+```http
+GET /v1/wallet/pocket
+```
+
+## Create a pocket
+
+Create a pocket for the currency you need before you fund, buy, or withdraw that asset.
+
+Exact request fields are in the [REST reference](/wallet/rest-overview). Amounts are decimal **strings**. Use `.` not `,`.
+
+## Typical partner sequence
+
+<Steps>
+  <Step title="Create the subaccount">
+    `POST /v1/account/subaccount` → store `userId`.
+  </Step>
+  <Step title="Complete KYC or KYB">
+    Natural persons: [KYC](/partner/kyc) until `verified` and `tier: 2`. Companies: [KYB](/partner/kyb).
+  </Step>
+  <Step title="Create fiat and crypto pockets">
+    EUR (or the fiat in your contract) plus the crypto assets you will buy or receive.
+  </Step>
+  <Step title="Fund, then operate">
+    [Fiat funding](/partner/fiat), [buy and sell](/wallet/buy-sell), then [withdrawals](/partner/withdrawals-address-book).
+  </Step>
+</Steps>
+
+<Info>
+Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com).
+</Info>

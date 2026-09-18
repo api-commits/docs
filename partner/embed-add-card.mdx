@@ -1,0 +1,28 @@
+---
+title: "Add card widget"
+description: "Load embed.bit2me.com/add-card in a WebView after signin."
+---
+
+Obtain `accessToken.token` with `POST /v1/signin/apikey` and `userId`.
+
+**Production URL**
+
+```
+https://embed.bit2me.com/add-card?t={token}&lang={language}
+```
+
+| Query | Required | Values |
+| --- | --- | --- |
+| `t` | Yes | Session token |
+| `lang` | No | `en`, `es`, or `pt` (default `en`) |
+
+Load this URL in your **in-app WebView**.
+
+| Event | Meaning |
+| --- | --- |
+| `teller.new.card.success` | Card added — `cardId`, `alias` |
+| `teller.new.card.error` | Failed — `code`, `message` |
+
+Cardholder name must match the Bit2Me account holder. Bit2Me may run card ownership verification.
+
+A non-production embed host is not published here — confirm with your integration manager if you need sandbox.

@@ -1,0 +1,31 @@
+---
+title: "Pro Trading overview"
+description: "Spot REST, public market data, private orders, and wss://ws.bit2me.com/v1/trading."
+---
+
+Pro is Bit2Me spot trading: markets, order book, OHLCV, orders, trades, balances, and working capital.
+
+<Info>
+Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com).
+</Info>
+
+<Columns cols={2}>
+  <Card title="First order" href="/pro/first-order">
+    Sign, fetch markets, place a limit or market order.
+  </Card>
+  <Card title="REST reference" href="/pro/rest-overview">
+    17 operations from trading-spot-rest.json.
+  </Card>
+  <Card title="WebSocket" href="/pro/websocket">
+    Public book and trades; private orders, fills, and balances.
+  </Card>
+  <Card title="Authentication" href="/guides/authentication">
+    Same HMAC as Wallet. Token for WS via POST /v1/signin/apikey.
+  </Card>
+</Columns>
+
+Official samples: [https://github.com/bit2me-devs/trading-spot-samples](https://github.com/bit2me-devs/trading-spot-samples) (`node/auth`, `node/rest/{market-data,trading,funding,ws-auth}`, `node/ws/{public,private}`).
+
+`bit2me-api-node-tool` is discontinued — historical HMAC helper only.
+
+API keys: [Get API keys](https://account.bit2me.com/api-keys). Use **Trade** scope to create or cancel orders. Market data GETs do not require a key.

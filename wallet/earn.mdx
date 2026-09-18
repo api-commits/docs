@@ -1,0 +1,24 @@
+---
+title: "Earn"
+description: "Staking positions, rewards, and movements on the Wallet API."
+---
+
+Earn (staking) lives on the gateway under `/v1/earn/*`. REST pages are generated from the Wallet OpenAPI snapshot.
+
+Typical reads:
+
+| Call | Use |
+| --- | --- |
+| `GET /v1/earn/summary` | Aggregated rewards |
+| `GET /v1/earn/wallets/{walletId}` | One Earn wallet |
+| `GET /v1/earn/wallets/{walletId}/movements` | Movement history |
+| `GET /v1/earn/wallets/rewards/config` | Global rewards config |
+| `POST /v1/earn/movements` | Create an Earn movement (deposit/withdraw as documented in the spec) |
+
+Use the [REST reference](/wallet/rest-overview) for request bodies. Do not invent APY figures here.
+
+Internal Wallet ↔ Earn transfers are supported. **External blockchain withdrawals are not available through MCP**; use the withdrawal guides for on-chain sends.
+
+<Info>
+Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com).
+</Info>
