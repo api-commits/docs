@@ -7,7 +7,7 @@ Snapshot: `openapi/trading-spot-rest.json` (17 operations). Server: `https://gat
 
 | Tag | What you get |
 | --- | --- |
-| MarketData | Markets, candles, order book, tickers, last trades (no API key) |
+| MarketData | Markets, candles, order book, tickers, last trades (no API key). Historical OHLCV: [Market data](/pro/market-data) (720 candles per request) |
 | Trading | Add / get / cancel orders and trades |
 | Funding | Balance, working capital, deposit, withdraw, movements |
 | WsAuth | `POST /v1/signin/apikey` — token for Pro WS (**1 minute** TTL) |
@@ -19,3 +19,5 @@ Market data is unsigned, but this site still uses a **simple** playground so sig
 `x-codeSamples` on each operation point at [https://github.com/bit2me-devs/trading-spot-samples](https://github.com/bit2me-devs/trading-spot-samples).
 
 Pro deposit/withdraw here move funds between **Wallet and Pro**, not to an external chain. External crypto out is [address book](/partner/withdrawals-address-book) or [Wallet legacy](/partner/withdrawals-wallet).
+
+Until cutover, the live Scalar catalog remains [api.bit2me.com/doc](https://api.bit2me.com/doc). Gateway notification WebSocket host is in that Scalar session or from your integration manager — not on this Pro socket.

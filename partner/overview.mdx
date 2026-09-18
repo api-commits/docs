@@ -25,7 +25,10 @@ This page describes the published API. It is not legal advice. Bit2Me Legal and 
     Bank, card, Apple Pay, Google Pay, PIX via Teller / Paylands.
   </Card>
   <Card title="Withdrawals" href="/partner/withdrawals-address-book">
-    Address book (target path) and Wallet legacy (still live).
+    Verify the destination wallet, then draft and accept. Address book is the target path.
+  </Card>
+  <Card title="Travel Rule" href="/partner/travel-rule">
+    POST /v2/blockchain-manager/travel-rule-order — not Embed report.
   </Card>
   <Card title="Transfers" href="/partner/transfers">
     Social Pay vs pocket transfer — two rails.
@@ -37,7 +40,8 @@ This page describes the published API. It is not legal advice. Bit2Me Legal and 
 - One end user = one subaccount. Send `X-SUBACCOUNT-ID` after create.
 - Do not treat the user as live until KYC `status: verified` and `tier: 2` (persons).
 - Do not call identity init on `type: company`.
-- Travel Rule only when the order/transaction status asks for user information.
+- The first time a subaccount sends crypto to a new blockchain address, [verify that destination](/partner/withdrawals-address-book) with 2FA before you withdraw.
+- Travel Rule is [its own gateway call](/partner/travel-rule), only when status is `pending-user-information` / `pending_user_information`. Do not use Embed `report` for this.
 - Apple Pay must leave the in-app WebView.
 
 <Info>

@@ -1,0 +1,34 @@
+---
+title: "Changelog"
+description: "Deprecated endpoints and fields from the published OpenAPI snapshots. No sunset dates are published here."
+keywords: ["changelog", "deprecated", "Travel Rule", "address book"]
+---
+
+This page lists items marked `deprecated: true` in `openapi/crypto.json` and `openapi/trading-spot-rest.json`. Sunset dates are **not published**. Prefer the replacement while the old path remains in the snapshot.
+
+Embed (`openapi/embed.json`) has no deprecated operations in this snapshot.
+
+<Update label="Deprecated REST operations" description="OpenAPI snapshot" tags={["Deprecated", "Wallet", "Partner"]}>
+  These operations are marked deprecated. They may still respond. Move to the replacement.
+
+  | Deprecated | Replacement |
+  | --- | --- |
+  | `GET /v1/wallet/transaction` | `GET /v2/wallet/transaction` (offset/limit) or `GET /v3/wallet/transaction` (cursor pagination) |
+  | `POST /v1/blockchain-manager/travel-rule-order/{orderId}` | `POST /v2/blockchain-manager/travel-rule-order/{orderId}` — see [Travel Rule](/partner/travel-rule) |
+  | `GET /v1/compliance/blockchain-address-confirmation/wallet-movement/{walletMovementId}` | `POST /v1/compliance/address-book/{addressBookId}/confirm` — see [Address book withdrawals](/partner/withdrawals-address-book) |
+  | `POST /v1/compliance/blockchain-address-confirmation/wallet-movement/{walletMovementId}/confirm` | Same address-book confirm |
+
+  `POST /v1/wallet/transaction` and `POST /v1/wallet/transaction/proforma` are **not** marked deprecated. Prefer the address-book withdrawal path for new subaccount crypto out.
+</Update>
+
+<Update label="Deprecated fields" description="OpenAPI snapshot" tags={["Deprecated", "Pro"]}>
+  | Location | Field | Notes |
+  | --- | --- | --- |
+  | `GET /v1/trading/market-config` response (`MarketConfigResponse`) | `tickSize` | Marked deprecated. Use `pricePrecision` for price decimal places. |
+
+  No Pro REST **operation** is marked deprecated in `openapi/trading-spot-rest.json`.
+</Update>
+
+<Info>
+Check [status.bit2me.com](https://status.bit2me.com) before you treat a 404 or 410 as a sunset. If the platform is healthy and the replacement fails, [open a support ticket](https://support.bit2me.com).
+</Info>

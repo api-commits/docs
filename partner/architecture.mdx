@@ -25,8 +25,9 @@ sequenceDiagram
   B->>G: Teller proforma
   G-->>B: WS teller-order-v1
   B->>G: Wallet buy proforma + execute
+  B->>G: Verify destination (address book + 2FA)
   B->>G: Crypto withdraw (address book or Wallet)
-  Note over B,G: Travel Rule only if pending user information
+  Note over B,G: Travel Rule POST /v2/.../travel-rule-order only if pending user information
 ```
 
 ## Auth layers

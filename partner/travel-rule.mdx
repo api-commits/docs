@@ -1,0 +1,42 @@
+---
+title: "Travel Rule"
+description: "Submit originator and beneficiary data with POST /v2/blockchain-manager/travel-rule-order when the withdrawal asks for it."
+keywords: ["Travel Rule", "pending-user-information", "travel-rule-order"]
+---
+
+<Warning>
+This page describes the published API. It is not legal advice. Bit2Me Legal and Compliance must review KYC, KYB, Travel Rule, and 2FA copy before this portal is announced to partners.
+</Warning>
+
+You **report Travel Rule data** to Bit2Me on the gateway. You do **not** use Embed `POST /v1/b2m/transaction/report` for this. That Embed path is a callback Bit2Me sends to **your** backend about widget transactions. See [Partner REST overview](/partner/rest-overview).
+
+## Endpoint
+
+```http
+POST /v2/blockchain-manager/travel-rule-order/{orderId}
+```
+
+`{orderId}` is the withdrawal / transaction id from the address-book accept or Wallet execute response.
+
+Call this **only** when status is `pending-user-information` or `pending_user_information`. Skip it for every other status. Do not use Travel Rule v1 (`POST /v1/blockchain-manager/travel-rule-order/{orderId}` is deprecated).
+
+If the API asks for this payload and you do not send it, the operation stays in that status and is cancelled within a few hours. EUR thresholds are **not published** here.
+
+## Payload fields from OpenAPI
+
+Always send `walletType` (`unhosted` or `exchange`) and `walletOwnership` (`own` or `other`). Add `exchangeName` when the type is `exchange`. Send person fields when the API requires them for that case.
+
+Public FAQ (not a substitute for the API response): [Travel Rule frequently asked questions](https://support.bit2me.com/en/support/solutions/articles/35000278021-travel-rule-frequently-asked-questions).
+
+## Where it sits in the withdrawal
+
+| Path | When you submit Travel Rule |
+| --- | --- |
+| [Address book](/partner/withdrawals-address-book) | After you accept the draft, **if** status is `pending-user-information` |
+| [Wallet legacy](/partner/withdrawals-wallet) | After execute, **if** GET transaction status is `pending_user_information` |
+
+Travel Rule is separate from **destination wallet verification**. Verifying a new on-chain address happens first (address book confirm, or the legacy movement confirmation). See those pages.
+
+<Info>
+Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com).
+</Info>

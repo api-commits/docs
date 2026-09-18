@@ -9,12 +9,12 @@ This page describes the published API. It is not legal advice. Bit2Me Legal and 
 
 `POST /v1/wallet/transaction/proforma` and `POST /v1/wallet/transaction` are **not** marked deprecated. Prefer [address book](/partner/withdrawals-address-book) for new subaccount work. Sunset dates are not published.
 
-Two optional branches:
+Two optional branches after execute. Prefer [address book](/partner/withdrawals-address-book) for **new** destinations: that path verifies the wallet **before** you withdraw.
 
-| Branch | Required when | Skip when |
-| --- | --- | --- |
-| Travel Rule | Status is `pending_user_information` | Status is anything else |
-| Address confirmation | `isVerified: false` | Already verified, or GET stays 404 |
+| Branch | What it is | Required when | Skip when |
+| --- | --- | --- | --- |
+| Travel Rule | Submit originator/beneficiary data to Bit2Me (`POST /v2/blockchain-manager/travel-rule-order/{id}`). Not Embed `report`. | Status is `pending_user_information` | Status is anything else |
+| Destination verification | Confirm the on-chain destination for this movement | `isVerified: false` | Already verified, or GET stays 404 |
 
 ```mermaid
 flowchart TD
@@ -45,16 +45,18 @@ flowchart TD
     ```http
     GET /v1/wallet/transaction/{id}
     ```
-    Call Travel Rule **only** for `pending_user_information`. Terminal statuses (`canceled`, `error`, `rejected`, `expired`) must not be retried with the same id.
+    Call [Travel Rule](/partner/travel-rule) **only** for `pending_user_information`. Terminal statuses (`canceled`, `error`, `rejected`, `expired`) must not be retried with the same id.
   </Step>
-  <Step title="Travel Rule (optional)">
+  <Step title="Travel Rule (only if status asks)">
     ```http
     POST /v2/blockchain-manager/travel-rule-order/{orderId}
     ```
-    `{orderId}` is the transaction id. Payload uses `walletType` / `walletOwnership` (plus person or exchange fields when required). See [Travel Rule FAQ](https://support.bit2me.com/en/support/solutions/articles/35000278021-travel-rule-frequently-asked-questions).
+    `{orderId}` is the transaction id. This is the Travel Rule submission, not Embed `report`. Payload uses `walletType` / `walletOwnership` (plus person or exchange fields when required). See [Travel Rule](/partner/travel-rule).
   </Step>
-  <Step title="Address confirmation (optional)">
-    `GET /v1/compliance/blockchain-address-confirmation/wallet-movement/{movementId}`. Confirm with 2FA only if `isVerified: false`. Persistent **404** means confirmation is not required.
+  <Step title="Destination wallet verification (first use on this path)">
+    OpenAPI marks this pair **deprecated** in favour of address-book confirm.
+
+    `GET /v1/compliance/blockchain-address-confirmation/wallet-movement/{movementId}`. Confirm with 2FA only if `isVerified: false`. Persistent **404** means confirmation is not required for that movement.
   </Step>
 </Steps>
 

@@ -5,10 +5,10 @@ description: "Address book vs Wallet legacy, and when Travel Rule applies."
 
 | Path | Use |
 | --- | --- |
-| [Address book](/partner/withdrawals-address-book) | Current OpenAPI target for subaccounts: verified destination → draft → accept |
-| [Wallet legacy](/partner/withdrawals-wallet) | Still live: proforma + execute with `destination.address` |
+| [Address book](/partner/withdrawals-address-book) | Current OpenAPI target: **verify the destination wallet** (create + 2FA confirm) → draft → accept |
+| [Wallet legacy](/partner/withdrawals-wallet) | Still live: proforma + execute with `destination.address`. First-use destination confirm is deprecated here |
 
-Travel Rule (`POST /v2/blockchain-manager/travel-rule-order/{id}`) **only** when status is `pending-user-information` / `pending_user_information`. Skip it otherwise.
+[Travel Rule](/partner/travel-rule) is `POST /v2/blockchain-manager/travel-rule-order/{id}`, **only** when status is `pending-user-information` / `pending_user_information`. It is not Embed `POST /v1/b2m/transaction/report`.
 
 Do not use Travel Rule v1. Do not invent TTLs, sunset dates, or EUR thresholds.
 

@@ -8,3 +8,9 @@ drafts/
 
 # Raw snapshots not wired into docs.json (markdown-only or diagrams)
 .raw-openapi/
+
+# Internal authoring instructions — not a customer page
+AGENTS.md
+
+# Local Mintlify preview cache
+.mintlify-home/

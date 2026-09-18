@@ -23,11 +23,20 @@ Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout 
   <Step title="Check ticker or book">
     `GET /v2/trading/tickers` and `GET /v2/trading/order-book`. Still public.
   </Step>
+  <Step title="Fund Pro from Wallet">
+    Spot orders debit **Pro** balances, not Simple Wallet pockets. Move funds first:
+
+    ```http
+    POST /v1/trading/wallet/deposit
+    ```
+
+    HTTP **412** is insufficient Pro funds (including fees).
+  </Step>
   <Step title="Place the order">
     ```http
     POST /v1/trading/order
     ```
-    Example body (sign `nonce:path:JSON.stringify(body)`):
+    Example body (sign `nonce:path:` plus compact `JSON.stringify(body)`). Pro symbols use a slash (`BTC/EUR`), not MCP `BTC-EUR`:
 
     ```json
     {

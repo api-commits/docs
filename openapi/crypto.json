@@ -50,13 +50,95 @@
     }
   ],
   "paths": {
+    "/v1/signin/apikey": {
+      "post": {
+        "tags": [
+          "Access"
+        ],
+        "summary": "Get HMAC session token",
+        "description": "HMAC API-key sign-in. Returns a session token for Pro WebSocket and for widgets when you send userId. This is not POST /v1/signin/embed.",
+        "operationId": "signInApiKey",
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "$ref": "#/components/schemas/UserIdParam"
+                  }
+                }
+              }
+            }
+          },
+          "description": "The data to sign in"
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "accessToken"
+                  ],
+                  "properties": {
+                    "accessToken": {
+                      "$ref": "#/components/schemas/TokenResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "Js",
+            "label": "Node",
+            "source": "const axios = require('axios');\nconst crypto = require('crypto');\n\nconst API_KEY = 'YOUR_API_KEY';\nconst SECRET = 'YOUR_API_SECRET';\n\nconst NONCE = Date.now();\nconst PATH = '/v1/signin/apikey';\nconst SERVER = 'https://gateway.bit2me.com';\n\nconst getAuthHeaders = (nonce, path, body) => {\n  const messageToSign = getClientMessageToSign(nonce, path, body);\n  const signature = getMessageSignature(messageToSign, SECRET);\n\n  return {\n    headers: {\n      'x-api-key': API_KEY,\n      'api-signature': signature,\n      'x-nonce': nonce\n    }\n  };\n};\n\nconst getClientMessageToSign = (nonce, url, body) => {\n  const hasBody = !!body;\n\n  return hasBody\n    ? `${nonce}:${url}:${JSON.stringify(body)}`\n    : `${nonce}:${url}`;\n};\n\nconst getMessageSignature = (message, secret) => {\n  const hash = crypto.createHash('sha256');\n  const hmac = crypto.createHmac('sha512', secret);\n  const hashDigest = hash.update(message).digest('binary');\n  const hmacDigest = hmac.update(hashDigest, 'binary').digest('base64');\n\n  return hmacDigest;\n};\n\nconst config = getAuthHeaders(NONCE, PATH, {});\naxios.post(`${SERVER}${PATH}`, {}, config).then(response=>console.log(response.data));\n"
+          },
+          {
+            "lang": "Shell",
+            "label": "cURL",
+            "source": "# Get authorized token by apikey\ncurl -X POST ${SERVER_URL}/v1/signin/apikey\n  -H 'Content-type: application/json'\n  -H 'X-API-KEY: <api key>'\n  -H 'api-signature: <sign message>'\n  -H 'x-nonce: <nonce>'\n"
+          }
+        ]
+      }
+    },
     "/v1/signin/embed": {
       "post": {
         "tags": [
           "Access"
         ],
-        "summary": "Signing to embed subaccount",
-        "description": "Generates an access token and refresh token that you can use to call other APIs.",
+        "summary": "Exchange token for embed session",
+        "description": "Token exchange for embed. POST /v1/signin/embed with accessToken. This is not HMAC API-key sign-in (use POST /v1/signin/apikey).",
         "operationId": "signinEmbed",
         "requestBody": {
           "content": {
@@ -72,7 +154,7 @@
               }
             }
           },
-          "description": "The data to sigin",
+          "description": "The data to sign in",
           "required": true
         },
         "responses": {
@@ -127,88 +209,6 @@
             "lang": "Shell",
             "label": "cURL",
             "source": "# Signin to embed subaccount\ncurl -X POST ${SERVER_URL}/v1/signin/embed\n  -H 'Content-type: application/json'\n  -d '{\"accessToken\":\"<token>\"}'\n"
-          }
-        ]
-      }
-    },
-    "/v1/signin/apikey": {
-      "post": {
-        "tags": [
-          "Access"
-        ],
-        "summary": "Authorize user by apiKey",
-        "description": "Authorize user by apiKey",
-        "operationId": "signInApiKey",
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "userId": {
-                    "$ref": "#/components/schemas/UserIdParam"
-                  }
-                }
-              }
-            }
-          },
-          "description": "The data to sigin"
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "accessToken"
-                  ],
-                  "properties": {
-                    "accessToken": {
-                      "$ref": "#/components/schemas/TokenResponse"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "User not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "x-codeSamples": [
-          {
-            "lang": "Js",
-            "label": "Node",
-            "source": "const axios = require('axios');\nconst crypto = require('crypto');\n\nconst API_KEY = 'YOUR_API_KEY';\nconst SECRET = 'YOUR_API_SECRET';\n\nconst NONCE = Date.now();\nconst PATH = '/v1/signin/apikey';\nconst SERVER = 'https://gateway.bit2me.com';\n\nconst getAuthHeaders = (nonce, path, body) => {\n  const messageToSign = getClientMessageToSign(nonce, path, body);\n  const signature = getMessageSignature(messageToSign, SECRET);\n\n  return {\n    headers: {\n      'x-api-key': API_KEY,\n      'api-signature': signature,\n      'x-nonce': nonce\n    }\n  };\n};\n\nconst getClientMessageToSign = (nonce, url, body) => {\n  const hasBody = !!body;\n\n  return hasBody\n    ? `${nonce}:${url}:${JSON.stringify(body)}`\n    : `${nonce}:${url}`;\n};\n\nconst getMessageSignature = (message, secret) => {\n  const hash = crypto.createHash('sha256');\n  const hmac = crypto.createHmac('sha512', secret);\n  const hashDigest = hash.update(message).digest('binary');\n  const hmacDigest = hmac.update(hashDigest, 'binary').digest('base64');\n\n  return hmacDigest;\n};\n\nconst config = getAuthHeaders(NONCE, PATH, {});\naxios.post(`${SERVER}${PATH}`, {}, config).then(response=>console.log(response.data));\n"
-          },
-          {
-            "lang": "Shell",
-            "label": "cURL",
-            "source": "# Get authorized token by apikey\ncurl -X POST ${SERVER_URL}/v1/signin/apikey\n  -H 'Content-type: application/json'\n  -H 'X-API-KEY: <api key>'\n  -H 'api-signature: <sign message>'\n  -H 'x-nonce: <nonce>'\n"
           }
         ]
       }

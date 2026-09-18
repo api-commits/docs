@@ -30,9 +30,11 @@ Before you start, check [status.bit2me.com](https://status.bit2me.com). If Auth 
     - No body: `{nonce}:{path}`
     - With JSON body: `{nonce}:{path}:{JSON.stringify(body)}`
 
-    `nonce` is Unix time. The documented valid window is **5 seconds**. Sync the client clock with NTP.
+    `nonce` is Unix time in **milliseconds** (`Date.now()` / `int(time.time() * 1000)`). The documented clock-skew window is **5 seconds**. Sync the client clock with NTP.
 
-    Full algorithm and a known-answer fixture: [Authentication](/guides/authentication).
+    Sign JSON bodies with compact JSON (`JSON.stringify` in JavaScript; `json.dumps(..., separators=(",", ":"))` in Python). Full algorithm and a known-answer fixture: [Authentication](/guides/authentication).
+
+    Pro REST pairs look like `BTC/EUR`. MCP tools use `BTC-EUR`. Wallet buy/sell uses pocket UUIDs. Do not mix formats on the same call.
   </Step>
   <Step title="Call a private endpoint">
     Example: list pockets on the parent account.

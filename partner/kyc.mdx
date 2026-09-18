@@ -17,7 +17,7 @@ Legal entities use [KYB](/partner/kyb) — do not mix this flow into companies.
 | --- | --- |
 | Parent | Your institution is already onboarded |
 | Per end user | One subaccount (`userId` UUID) |
-| After create | `x-subaccount-id: {userId}` on every call |
+| After create | `X-SUBACCOUNT-ID: {userId}` on every call |
 | Consent | User accepts **general** and **privacy-policy** in **your** UI before you create the subaccount |
 
 ```mermaid
@@ -46,7 +46,7 @@ flowchart LR
     ```http
     POST /v1/account/subaccount
     ```
-    Result: `userId`. From now on send `x-subaccount-id`. Initial acceptance is recorded on create — you do not need a separate terms POST for first onboarding.
+    Result: `userId`. From now on send `X-SUBACCOUNT-ID`. Initial acceptance is recorded on create — you do not need a separate terms POST for first onboarding.
   </Step>
   <Step title="Update the AML profile">
     ```http

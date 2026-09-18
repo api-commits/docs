@@ -14,7 +14,7 @@ Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout 
 1. Parent KYB complete.
 2. Subaccount created and, for persons, KYC `verified` / `tier: 2`.
 3. Fiat pocket for the currency.
-4. `x-subaccount-id` plus HMAC headers.
+4. `X-SUBACCOUNT-ID` plus HMAC headers.
 
 ## Deposit instructions
 
@@ -36,6 +36,6 @@ Documented `method` values include `creditCard`, `google-pay`, `apple-pay`, and 
 
 ## Fiat withdrawals
 
-Bank withdrawals are a separate Funding path from crypto withdrawals. Follow the Funding tag in the REST reference. Do not reuse the address-book crypto flow for SEPA/PIX out.
+Fiat out uses Wallet proforma with `destination.bankAccount` on `POST /v1/wallet/transaction/proforma`, then execute. That is **not** the address-book crypto flow and **not** Teller deposit proforma. Follow the Funding / Wallet tags in the [Wallet REST](/wallet/rest-overview) reference for the `bankAccount` object.
 
 USD availability on Wallet is not documented as generally available — confirm with sales if you need USD.

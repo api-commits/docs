@@ -1,31 +1,153 @@
 ---
 title: "Gateway notifications"
-description: "Authenticate with JWT or API key, reconnect, and consume the notification contract."
+description: "Connect to the gateway WebSocket, authenticate with JWT or API key, and receive wallet, teller, identity, and loan events."
 ---
 
-The gateway WebSocket pushes **notifications** for a logged-in account (wallet, teller, identity, loans). It is not the Pro trading socket.
+This socket pushes **notifications** for a logged-in account (wallet, teller, identity, loans). It is **not** [Pro Trading WebSocket](/pro/websocket) (`wss://ws.bit2me.com/v1/trading`).
+
+You can **only** receive events after a successful authenticate. If authentication fails, the server closes with code **4000**.
 
 <Info>
-Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com).
+Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or disconnect loop. If the platform is healthy and this persists, [open a support ticket](https://support.bit2me.com).
 </Info>
 
-## Connection
+## URL
 
-The public OpenAPI samples use a placeholder host (`wss://HOST:PORT/`). Use the host your integration manager or live Scalar session provides. Do not guess a hostname.
+The published Crypto OpenAPI samples use a placeholder:
 
-After connect, authenticate:
-
-```json
-{ "type": "authenticate", "payload": { "token": "<jwt>" } }
+```text
+wss://${host}:${port}/
 ```
 
-or
+Use the host from your live Scalar session at [api.bit2me.com/doc](https://api.bit2me.com/doc) (WebSockets section) or from your integration manager. Do not use the Pro URL for these notifications.
+
+## Authenticate
+
+After `open`, send **one** authenticate message. Pick JWT **or** API key, not both on the same send.
+
+### Option 1 — JWT (`token`)
+
+1. Sign `POST https://gateway.bit2me.com/v1/signin/apikey` with HMAC. See [Authentication](/guides/authentication).
+2. Read `accessToken.token` from the **200** body. Honour `accessToken.expirationTime` from that response. Do not invent a TTL.
+3. For a **subaccount**, include `userId` in the sign-in body.
+
+```bash
+curl -X POST 'https://gateway.bit2me.com/v1/signin/apikey' \
+  -H 'Content-type: application/json' \
+  -H 'X-API-KEY: <api key>' \
+  -H 'api-signature: <hmac>' \
+  -H 'x-nonce: <nonce>'
+```
+
+Subaccount session:
+
+```bash
+curl -X POST 'https://gateway.bit2me.com/v1/signin/apikey' \
+  -H 'Content-type: application/json' \
+  -H 'X-API-KEY: <api key>' \
+  -H 'api-signature: <hmac>' \
+  -H 'x-nonce: <nonce>' \
+  -d '{"userId":"<subaccount uuid>"}'
+```
+
+Then on the socket:
+
+```json
+{ "type": "authenticate", "payload": { "token": "<accessToken.token>" } }
+```
+
+### Option 2 — API key (`apikey`)
+
+Send the **public** API key. The OpenAPI sample uses an array:
 
 ```json
 { "type": "authenticate", "payload": { "apikey": ["<api-key>"] } }
 ```
 
-If authentication fails, the server closes with code **4000**.
+This is not HMAC. HMAC is only for REST (and for fetching a JWT in option 1).
+
+## Connect example (browser)
+
+Same flow as [api.bit2me.com/doc](https://api.bit2me.com/doc) (WebSockets → Code Snippets Examples). Replace `host`, `port`, and `jwt` or `apikey`.
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript">
+      const host = "HOST"; // from Scalar / your integration manager
+      const port = "PORT";
+      const jwt = "ACCESS_TOKEN"; // accessToken.token from POST /v1/signin/apikey
+      const apikey = "API_KEY"; // public key, if you authenticate with apikey instead
+
+      const ws = new WebSocket(`wss://${host}:${port}/`);
+
+      ws.addEventListener("error", (err) => {
+        console.error("websocket error:", err);
+      });
+
+      ws.addEventListener("open", () => {
+        console.debug("websocket connected");
+
+        // JWT
+        ws.send(JSON.stringify({ type: "authenticate", payload: { token: jwt } }));
+
+        // or API key (do not send both)
+        // ws.send(JSON.stringify({ type: "authenticate", payload: { apikey: [apikey] } }));
+      });
+
+      ws.addEventListener("message", (message) => {
+        const msg = JSON.parse(message.data);
+        console.debug(`websocket message: type: ${msg.type}, id: ${msg.id}, time: ${msg.time}`);
+      });
+
+      ws.addEventListener("close", (evt) => {
+        if (evt.code === 4000) {
+          console.log(`Error while authenticating: ${evt.code}/${evt.reason}`);
+        } else if (evt.code === 4001) {
+          console.log(`Error rate limit: ${evt.code}/${evt.reason}`);
+        }
+        // reconnect with backoff
+      });
+    </script>
+  </head>
+  <body></body>
+</html>
+```
+
+## Connect example (Node.js)
+
+```javascript
+const WebSocket = require("ws");
+
+const host = process.env.GATEWAY_WS_HOST; // placeholder in OpenAPI — do not hard-code Pro's host
+const port = process.env.GATEWAY_WS_PORT;
+const jwt = process.env.BIT2ME_ACCESS_TOKEN; // accessToken.token
+
+const ws = new WebSocket(`wss://${host}:${port}/`);
+
+ws.on("error", (err) => {
+  console.error("websocket error:", err);
+});
+
+ws.on("open", () => {
+  console.debug("websocket connected");
+  ws.send(JSON.stringify({ type: "authenticate", payload: { token: jwt } }));
+});
+
+ws.on("message", (data) => {
+  const msg = JSON.parse(data.toString());
+  console.debug(`type: ${msg.type}, id: ${msg.id}, time: ${msg.time}`, msg.payload);
+});
+
+ws.on("close", (code, reason) => {
+  if (code === 4000) {
+    console.log(`Error while authenticating: ${code}/${reason}`);
+  } else if (code === 4001) {
+    console.log(`Error rate limit: ${code}/${reason}`);
+  }
+});
+```
 
 ## Limits (same family as HTTP)
 
@@ -34,20 +156,45 @@ If authentication fails, the server closes with code **4000**.
 | More than **50** concurrent connections from one IP | Handshake **429** |
 | More than **50 messages per second** on one connection | Close **4001** |
 
-You can **only** receive events with a logged-in account.
-
 ## Reconnect
 
-Implement `on disconnect: reconnect` with backoff. Check [status.bit2me.com](https://status.bit2me.com) if reconnect loops during an incident.
+Implement `on disconnect: reconnect` with backoff. Authenticate again after every new `open`. Check [status.bit2me.com](https://status.bit2me.com) if reconnect loops during an incident.
 
 ## Message envelope
 
 Every notification has the same shape:
 
-```
-{ channel: string, id: string, time: number, type: string, payload: object }
+```json
+{
+  "channel": "notification",
+  "id": "string",
+  "time": 0,
+  "type": "wallet-transaction-v1",
+  "payload": {}
+}
 ```
 
-`payload` depends on `type`. The **notification** channel is the public contract. Do not treat `internal` (if you see it) as a stable API.
+`payload` depends on `type`. The **notification** channel is the public contract. Do not treat `internal` as a stable API.
 
 Event catalog: [Notification events](/wallet/websocket-events).
+
+## Explorer sample (not the notification socket)
+
+The OpenAPI also shows a **BTC testnet explorer** snippet. That path is not the account notification stream:
+
+```javascript
+const ws = new WebSocket(`wss://${host}:${port}/v1/explorer/BTCTEST`);
+
+ws.addEventListener("open", () => {
+  ws.send(JSON.stringify(["subscribe", "inv"]));
+});
+
+ws.addEventListener("message", (message) => {
+  const msg = JSON.parse(message.data);
+  if (msg[0] === "tx") {
+    console.debug("explorer tx:", msg[1]);
+  }
+});
+```
+
+Close **4002** on that sample means a wrong crypto explorer. Do not use this URL to receive `wallet-transaction-v1` or KYC events.

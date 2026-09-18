@@ -6,20 +6,22 @@ Server: https://gateway.bit2me.com
 Current Scalar reference (parallel): https://api.bit2me.com/doc
 Status: https://status.bit2me.com
 Support: https://support.bit2me.com
+Tickets: https://support.bit2me.com/en/support/tickets/new
 API keys: https://account.bit2me.com/api-keys
 MCP: https://mcp.bit2me.com
 OpenAPI snapshots in this repo: openapi/crypto.json, openapi/trading-spot-rest.json, openapi/embed.json
 
-Do not invent endpoints, SLAs, sunset dates, or Travel Rule thresholds. HMAC cannot be computed in the Mintlify playground.
+Do not invent endpoints, SLAs, sunset dates, or Travel Rule thresholds. HMAC cannot be computed in the Mintlify playground. Nonce is Unix time in milliseconds.
 
 ## Get started
 
-- [Home](https://bit2me.com): Product path chooser
+- [Home](/): Product path chooser
 - [Quickstart](/quickstart.mdx)
 - [Account model](/guides/account-model.mdx)
 - [Authentication (HMAC fixture)](/guides/authentication.mdx)
 - [Rate limits](/guides/rate-limits.mdx)
 - [Errors](/guides/errors.mdx)
+- [Changelog](/changelog.mdx)
 
 ## Wallet
 
@@ -27,6 +29,8 @@ Do not invent endpoints, SLAs, sunset dates, or Travel Rule thresholds. HMAC can
 - [Buy, sell, and swap](/wallet/buy-sell.mdx)
 - [Earn](/wallet/earn.mdx)
 - [Loans](/wallet/loans.mdx)
+- [Money flow](/wallet/money-flow.mdx)
+- [Wallet REST overview](/wallet/rest-overview.mdx)
 - [Gateway notifications](/wallet/websocket.mdx)
 - [Notification events](/wallet/websocket-events.mdx)
 
@@ -34,20 +38,47 @@ Do not invent endpoints, SLAs, sunset dates, or Travel Rule thresholds. HMAC can
 
 - [Overview](/pro/overview.mdx)
 - [First order](/pro/first-order.mdx)
+- [Market data](/pro/market-data.mdx)
+- [Pro REST overview](/pro/rest-overview.mdx)
 - [Pro WebSocket](/pro/websocket.mdx)
+- [Public channels](/pro/websocket-public.mdx)
+- [Private channels](/pro/websocket-private.mdx)
+- [Futures WebSocket](/pro/websocket-futures.mdx)
 - Samples: https://github.com/bit2me-devs/trading-spot-samples
 
 ## Partner
 
+- [Overview](/partner/overview.mdx)
+- [Architecture](/partner/architecture.mdx)
 - [KYC](/partner/kyc.mdx)
 - [KYB](/partner/kyb.mdx)
+- [Fiat](/partner/fiat.mdx)
 - [Apple Pay / Google Pay](/partner/apple-google-pay.mdx)
 - [Address book withdrawals](/partner/withdrawals-address-book.mdx)
 - [Wallet legacy withdrawals](/partner/withdrawals-wallet.mdx)
+- [Travel Rule](/partner/travel-rule.mdx)
 - [Social Pay vs pocket transfer](/partner/transfers.mdx)
+- [Partner REST overview](/partner/rest-overview.mdx)
+- [Embed widgets](/partner/widgets.mdx)
+- [Identity widget](/partner/embed-identity.mdx)
+- [Add card widget](/partner/embed-add-card.mdx)
 
 ## AI
 
 - [MCP overview](/ai/overview.mdx)
+- [Cursor setup](/ai/cursor.mdx)
+- [Claude Desktop setup](/ai/claude.mdx)
 - [Tool catalog](/ai/tools.mdx)
+- [MCP errors](/ai/errors.mdx)
 - Package: @bit2me/mcp-server (no external withdrawals)
+
+## Recipes
+
+- [Fix HMAC 401](/recipes/hmac-401.mdx)
+- [Missing subaccount header](/recipes/subaccount-header.mdx)
+- [Which withdrawal path?](/recipes/withdrawals.mdx)
+- [Apple Pay button missing](/recipes/apple-pay.mdx)
+- [Social Pay is not a pocket transfer](/recipes/social-pay.mdx)
+- [HTTP 429 and 418](/recipes/rate-limit.mdx)
+- [2FA 420 and 428](/recipes/totp.mdx)
+- [WebSocket vs polling](/recipes/websocket-vs-polling.mdx)

@@ -5,7 +5,16 @@ description: "How to use the generated Wallet OpenAPI reference on this site."
 
 The **REST** tab is generated from a snapshot of `openapi/crypto.json` (91 operations). Server: `https://gateway.bit2me.com`.
 
-Scalar grouping is preserved by OpenAPI tags: Access, Account, KYC, Wallet, Funding, Transfers, Earn, Pro (Trading Spot), Compliance, plus related tags in the full gateway spec.
+OpenAPI tags in this snapshot: Access, Wallet, Earn, Account, KYC, Funding, Compliance, Transfers, Market, Loan, Misc.
+
+| Tag | What it is |
+| --- | --- |
+| Access | HMAC `POST /v1/signin/apikey` (session token for widgets and Pro WS) vs `POST /v1/signin/embed` (embed token exchange — not HMAC API-key sign-in) |
+| Market | Wallet catalog (`/v1/currency/…`, `/v2/currency/…`). This is **not** Pro Trading MarketData (`/v1/trading/candle`, `/v2/trading/order-book`) |
+| Wallet / Funding | Pockets, transactions, teller deposits, crypto withdrawals |
+| KYC / Account / Compliance | Subaccounts, identity, address book, Travel Rule |
+
+Spot trading REST lives under [Pro REST](/pro/rest-overview) (`openapi/trading-spot-rest.json`).
 
 ## Playground
 
@@ -21,4 +30,4 @@ The older `bit2me-api-node-tool` repository is discontinued. Cite it only as a h
 
 ## Current Scalar site
 
-Until cutover, the live Scalar catalog remains [api.bit2me.com/doc](https://api.bit2me.com/doc).
+Until cutover, the live Scalar catalog remains [api.bit2me.com/doc](https://api.bit2me.com/doc). Gateway notification WebSocket host is in that Scalar session or from your integration manager. Deprecated operations in this snapshot: [Changelog](/changelog).

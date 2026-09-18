@@ -15,9 +15,13 @@ GET /v1/wallet/pocket
 
 ## Create a pocket
 
-Create a pocket for the currency you need before you fund, buy, or withdraw that asset.
+```http
+POST /v1/wallet/pocket
+```
 
-Exact request fields are in the [REST reference](/wallet/rest-overview). Amounts are decimal **strings**. Use `.` not `,`.
+Required body fields: `currency` (asset symbol from `GET /v2/currency/assets`) and `name`. HTTP **406** means the pocket limit for that asset is exceeded.
+
+Exact request fields are in the [REST reference](/api-reference/wallet/create-pocket). Amounts are decimal **strings**. Use `.` not `,`.
 
 ## Typical partner sequence
 

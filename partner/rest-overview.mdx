@@ -3,13 +3,33 @@ title: "Partner REST overview"
 description: "Embed snapshot plus the Wallet/Funding routes partners actually call."
 ---
 
-The Partner **REST** tab highlights Embed (`openapi/embed.json`: subaccount, signin, account, B2M authorize/report). Most partner money movement is on the [Wallet REST](/wallet/rest-overview) and Funding tags of `crypto.json`.
+The Partner **REST** tab highlights Embed (`openapi/embed.json`: subaccount, signin, account, and the callbacks Bit2Me posts to **your** backend).
+
+Those callbacks are `POST /v1/b2m/transaction/authorize` (you approve or reject a widget operation) and `POST /v1/b2m/transaction/report` (Bit2Me notifies you that a widget operation happened). **`report` is not Travel Rule.** Submit Travel Rule on the gateway: [Travel Rule](/partner/travel-rule) (`POST /v2/blockchain-manager/travel-rule-order/{orderId}`).
+
+Most partner money movement is on the [Wallet REST](/wallet/rest-overview) and Funding tags of `crypto.json`.
 
 | Area | Spec |
 | --- | --- |
 | Widgets / session | `openapi/embed.json` |
 | KYC, pockets, teller, withdrawals | `openapi/crypto.json` |
 
+## Wallet REST operations partners call
+
+Use these generated Wallet REST pages. Sign HMAC on your backend. The playground is **simple**.
+
+| Need | Call | Reference |
+| --- | --- | --- |
+| Create end-user subaccount | `POST /v1/account/subaccount` | [Create subaccount](/api-reference/account/create-subaccount) |
+| Person KYC session | `POST /v3/account/verify/identity/init` | [Init KYC verification](/api-reference/kyc/init-kyc-verification) |
+| Create a currency pocket | `POST /v1/wallet/pocket` | [Create pocket](/api-reference/wallet/create-pocket) |
+| Bank-transfer deposit details | `GET /v1/teller/pocket/reference` | [Get pocket reference](/api-reference/funding/get-pocket-reference) |
+| Card / Apple Pay / Google Pay / PIX | `POST /v1/teller/order/proforma` | [Create deposit](/api-reference/funding/create-deposit) |
+| Verify a crypto destination | `POST /v1/blockchain-manager/address-book` | [Create an address book entry](/api-reference/funding/create-an-address-book-entry) |
+| Travel Rule (only if status asks) | `POST /v2/blockchain-manager/travel-rule-order/{orderId}` | [Travel Rule](/partner/travel-rule) |
+
+HMAC session for widgets and Pro WS is `POST /v1/signin/apikey`, not `POST /v1/signin/embed`. See [Authentication](/guides/authentication).
+
 Playground is **simple** because HMAC cannot be computed in the browser. Copy examples, sign on your backend.
 
-Until cutover: [api.bit2me.com/doc](https://api.bit2me.com/doc).
+Until cutover, the live Scalar catalog remains [api.bit2me.com/doc](https://api.bit2me.com/doc). Gateway notification WebSocket host is in that Scalar session or from your integration manager — not invented here.

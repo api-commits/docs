@@ -23,7 +23,7 @@
   "logo": {
     "light": "/logo/light.svg",
     "dark": "/logo/dark.svg",
-    "href": "https://bit2me.com"
+    "href": "/"
   },
   "appearance": {
     "default": "system"
@@ -65,6 +65,10 @@
           {
             "label": "Current API reference (Scalar)",
             "href": "https://api.bit2me.com/doc"
+          },
+          {
+            "label": "Changelog",
+            "href": "/changelog"
           }
         ]
       },
@@ -77,7 +81,7 @@
           },
           {
             "label": "Submit a ticket",
-            "href": "https://support.bit2me.com"
+            "href": "https://support.bit2me.com/en/support/tickets/new"
           }
         ]
       },
@@ -150,7 +154,8 @@
                   "guides/account-model",
                   "guides/authentication",
                   "guides/rate-limits",
-                  "guides/errors"
+                  "guides/errors",
+                  "changelog"
                 ]
               },
               {
@@ -161,6 +166,53 @@
                   "wallet/earn",
                   "wallet/loans",
                   "wallet/money-flow"
+                ]
+              },
+              {
+                "group": "Pro",
+                "pages": [
+                  "pro/overview",
+                  "pro/first-order",
+                  "pro/market-data",
+                  "pro/websocket",
+                  "pro/websocket-public",
+                  "pro/websocket-private",
+                  "pro/websocket-futures"
+                ]
+              },
+              {
+                "group": "Partners",
+                "pages": [
+                  "partner/overview",
+                  "partner/architecture",
+                  "partner/kyc",
+                  "partner/kyb",
+                  "partner/fiat",
+                  "partner/apple-google-pay",
+                  "partner/withdrawals-address-book",
+                  "partner/withdrawals-wallet",
+                  "partner/travel-rule",
+                  "partner/transfers",
+                  "partner/widgets"
+                ]
+              },
+              {
+                "group": "AI",
+                "pages": [
+                  "ai/overview",
+                  "ai/cursor",
+                  "ai/claude",
+                  "ai/tools",
+                  "ai/errors"
+                ]
+              },
+              {
+                "group": "Troubleshoot",
+                "pages": [
+                  "recipes/hmac-401",
+                  "recipes/subaccount-header",
+                  "recipes/rate-limit",
+                  "recipes/websocket-vs-polling"
                 ]
               }
             ]
@@ -207,8 +259,17 @@
                 "pages": [
                   "pro/overview",
                   "pro/first-order",
+                  "pro/market-data",
                   "guides/authentication",
                   "guides/rate-limits"
+                ]
+              },
+              {
+                "group": "Troubleshoot",
+                "pages": [
+                  "recipes/hmac-401",
+                  "recipes/rate-limit",
+                  "recipes/websocket-vs-polling"
                 ]
               }
             ]
@@ -278,7 +339,18 @@
                   "partner/apple-google-pay",
                   "partner/withdrawals-address-book",
                   "partner/withdrawals-wallet",
+                  "partner/travel-rule",
                   "partner/transfers"
+                ]
+              },
+              {
+                "group": "Troubleshoot",
+                "pages": [
+                  "recipes/subaccount-header",
+                  "recipes/withdrawals",
+                  "recipes/apple-pay",
+                  "recipes/social-pay",
+                  "recipes/totp"
                 ]
               }
             ]
@@ -354,6 +426,11 @@
         ]
       }
     ]
+  },
+  "seo": {
+    "metatags": {
+      "canonical": "https://bit2me.mintlify.site"
+    }
   },
   "redirects": [
     {

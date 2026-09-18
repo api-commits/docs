@@ -19,12 +19,12 @@ All gateway HTTP endpoints enforce usage limits. Exceeding them can return:
 
 To request a new tier, contact [support](https://support.bit2me.com). Do not assume an ad-hoc raise.
 
-WebSocket connections share rate limiting with HTTP in the notification channel:
+WebSocket connections share rate limiting with HTTP in the **gateway notification** channel:
 
 - More than **50 concurrent connections** from the same IP → handshake **429**
 - More than **50 messages per second** on a connection → close **4001**
 
-Pro Trading WebSocket command limits are documented with that API. See [Pro WebSocket](/pro/websocket).
+Pro Trading WebSocket command RPM is **not published** in the Pro WS spec. Do not assume the notification-socket numbers apply to `wss://ws.bit2me.com/v1/trading`.
 
 <Tip>
 If you receive 429, back off and retry. Check [status.bit2me.com](https://status.bit2me.com) if failures cluster. If this persists, [open a support ticket](https://support.bit2me.com).

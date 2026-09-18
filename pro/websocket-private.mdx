@@ -24,4 +24,4 @@ If you subscribed with a `symbol`, unsubscribe with that same `symbol`.
 
 `executions` delivers both `my-orders` and `my-trades` events on one subscription.
 
-Command rate limits apply to this connection — see the Pro WS spec notes and [Rate limits](/guides/rate-limits).
+Pro Trading WebSocket command RPM is not published in the Pro WS spec. Gateway **notification** socket limits (50 connections per IP, 50 messages per second) are on [Rate limits](/guides/rate-limits) and do not apply to this URL.

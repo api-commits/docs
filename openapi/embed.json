@@ -130,7 +130,7 @@
               }
             }
           },
-          "description": "The data to sigin"
+          "description": "The data to sign in"
         },
         "responses": {
           "200": {

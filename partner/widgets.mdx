@@ -22,6 +22,12 @@ POST https://gateway.bit2me.com/v1/signin/apikey
 }
 ```
 
-Use `accessToken.token` as `t` on Embed URLs. Sign the call with parent HMAC. See [Identity](/partner/embed-identity) and [Add card](/partner/embed-add-card).
+Use `accessToken.token` as `t` on Embed URLs. Sign the call with parent HMAC (`POST /v1/signin/apikey` with `userId`). See [Identity](/partner/embed-identity) and [Add card](/partner/embed-add-card).
 
-Other Embed URL: `https://embed.bit2me.com/dashboard?t={token}&lang={lang}` (buy/sell/swap dashboard). Same `t` and `lang` rules (`en`, `es`, `pt`).
+The buy/sell/swap dashboard uses the same token and language query:
+
+```
+https://embed.bit2me.com/dashboard?t={token}&lang={lang}
+```
+
+`lang` is `en`, `es`, or `pt` (default `en`). A non-production embed host is not published here.

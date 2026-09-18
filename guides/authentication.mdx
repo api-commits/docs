@@ -7,7 +7,7 @@ keywords: ["HMAC", "api-signature", "x-nonce", "x-totp"]
 Private endpoints on `https://gateway.bit2me.com` require an API key and an HMAC signature. Never share a key. If you suspect a leak, revoke it immediately.
 
 <Warning>
-If requests fail with 401, sync the machine clock with NTP first. The documented nonce window is 5 seconds. Check [status.bit2me.com](https://status.bit2me.com) before you assume a platform outage. If this persists, [open a support ticket](https://support.bit2me.com).
+If requests fail with 401, sync the machine clock with NTP first. The documented nonce window is 5 seconds of clock skew. Check [status.bit2me.com](https://status.bit2me.com) before you assume a platform outage. If this persists, [open a support ticket](https://support.bit2me.com/en/support/tickets/new).
 </Warning>
 
 ## Headers
@@ -15,9 +15,9 @@ If requests fail with 401, sync the machine clock with NTP first. The documented
 | Header | Required | Description |
 | --- | --- | --- |
 | `x-api-key` / `X-API-KEY` | Yes (private) | Public API key |
-| `x-nonce` | Yes (signed) | Unix timestamp. Valid window: **5 seconds** |
+| `x-nonce` | Yes (signed) | Unix time in **milliseconds** (`Date.now()`). Clock-skew window: **5 seconds** |
 | `api-signature` | Yes (signed) | HMAC described below |
-| `X-SUBACCOUNT-ID` | When acting for an end user | Subaccount `userId` |
+| `X-SUBACCOUNT-ID` | When acting for an end user | Subaccount `userId`. HTTP names are case-insensitive; samples use this spelling |
 | `x-totp` | Sensitive operations | 6-digit 2FA code |
 | `x-totp-type` | With `x-totp` | `gauth`, `sms`, or `email`. **Always `gauth` for subaccounts** |
 
@@ -27,12 +27,17 @@ Validate the server TLS certificate and abort if validation fails.
 
 1. Build the message:
    - No body: `{nonce}:{path}`
-   - JSON body: `{nonce}:{path}:{JSON.stringify(body)}`
+   - JSON body: `{nonce}:{path}:{compactJson}`
 2. SHA-256 the message (binary digest).
 3. HMAC-SHA512 using your **secret**, over that digest.
 4. Base64-encode the HMAC. That value is `api-signature`.
 
-The body used to sign **must** be the exact request body string. In JavaScript that is `JSON.stringify(body)`.
+The body used to sign **must** be the exact request body string:
+
+- JavaScript: `JSON.stringify(body)` (no spaces).
+- Python: `json.dumps(body, separators=(",", ":"))`.
+
+Do not mix pretty-printed JSON into the signature.
 
 <CodeGroup>
 ```javascript Node.js
@@ -60,7 +65,8 @@ def sign(nonce: str, path: str, secret: str, body=None) -> str:
     if body is None:
         message = f"{nonce}:{path}".encode()
     else:
-        message = f"{nonce}:{path}:{json.dumps(body)}".encode()
+        compact = json.dumps(body, separators=(",", ":"))
+        message = f"{nonce}:{path}:{compact}".encode()
     digest = hashlib.sha256(message).digest()
     return base64.b64encode(hmac.new(secret.encode(), digest, hashlib.sha512).digest()).decode()
 ```
@@ -80,6 +86,8 @@ Official Node samples for REST and WebSocket signing: [bit2me-devs/trading-spot-
 
 Use this to unit-test your signer. If your output does not match, fix concatenation or encoding before you hit production.
 
+The fixture nonce is HMAC-only. Live requests must send **milliseconds** (`Date.now()`), not this value.
+
 | Field | Value |
 | --- | --- |
 | Secret | `example_secret_do_not_use_in_production` |
@@ -89,14 +97,24 @@ Use this to unit-test your signer. If your output does not match, fix concatenat
 | Message | `1687155308:/v1/trading/wallet/balance` |
 | `api-signature` | `IgazRn9MPHcJjAfhrVHzI46U9iIDb7qbXYcTIN+9vrktJ6M4rET7WH+wasF+/8Thp9tzjkWaFCL8ASSzlY4D8g==` |
 
-POST example (default `JSON.stringify` spacing):
+POST example (`JSON.stringify` / Python `separators=(",", ":")` — no spaces):
 
 | Field | Value |
 | --- | --- |
 | Path | `/v1/trading/order` |
-| Body | `{"side": "buy", "symbol": "BTC/EUR", "price": "50000", "amount": "0.01", "orderType": "limit"}` |
-| Message | `1687155308:/v1/trading/order:{"side": "buy", "symbol": "BTC/EUR", "price": "50000", "amount": "0.01", "orderType": "limit"}` |
-| `api-signature` | `s4b8cCvUI4S7GBBrf7v8FvBYqDZYeTLCJ63fzuc7dxcj/2JH2eR+jihgmgF4KFj6jxj2v/nglmOkQQu0fNUCkQ==` |
+| Body | `{"side":"buy","symbol":"BTC/EUR","price":"50000","amount":"0.01","orderType":"limit"}` |
+| Message | `1687155308:/v1/trading/order:{"side":"buy","symbol":"BTC/EUR","price":"50000","amount":"0.01","orderType":"limit"}` |
+| `api-signature` | `TnwJpXmBNukFWneZrjQk+SCRk9Ck13B2oK7kSpnKEpdQajo9l9pn5sUnwIQcsguFmFBHDGwS2aOjXlMnKSIyXQ==` |
+
+## Pair formats
+
+Do not mix these on the same call:
+
+| Surface | Example |
+| --- | --- |
+| Pro REST / Pro WebSocket | `BTC/EUR` |
+| MCP tools | `BTC-EUR` |
+| Wallet buy / sell | Pocket UUIDs, not a pair string |
 
 ## TOTP
 
@@ -106,6 +124,8 @@ Some operations require 2FA:
 - `x-totp-type` — `gauth` \| `sms` \| `email`
 
 For **subaccount** operations, `x-totp-type` is always `gauth`.
+
+Enroll subaccount 2FA with `POST /v1/account/subaccount/sfa` then `PUT /v1/account/subaccount/sfa`. Parent path `POST /v1/account/settings/sfa` is a different account. Details: [2FA 420 and 428](/recipes/totp).
 
 ## Playground
 
@@ -120,3 +140,14 @@ When you create a key you can request:
 - **Withdraw** — withdrawals that bypass two-factor authentication
 
 Prefer IP allowlists on Trade and Withdraw keys.
+
+## Gateway WebSocket
+
+REST HMAC does not sign the notification socket. After `open` on `wss://${host}:${port}/` (host from Scalar / your integration manager):
+
+- JWT: `POST /v1/signin/apikey` (HMAC) → send `{ "type": "authenticate", "payload": { "token": "<accessToken.token>" } }`
+- Or API key: `{ "type": "authenticate", "payload": { "apikey": ["<api-key>"] } }`
+
+Failed auth closes the socket with **4000**. Full examples: [Gateway notifications](/wallet/websocket).
+
+Pro Trading uses a **different** URL and envelope (`event: authenticate` + REST token, 1 minute). See [Pro WebSocket](/pro/websocket).

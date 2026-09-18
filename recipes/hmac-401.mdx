@@ -9,10 +9,10 @@ Check [status.bit2me.com](https://status.bit2me.com) before opening a ticket. If
 
 <Steps>
   <Step title="Sync the clock">
-    HMAC uses Unix time. The documented nonce window is **5 seconds**. Enable NTP.
+    HMAC uses Unix time in **milliseconds** (`Date.now()`). The documented clock-skew window is **5 seconds**. Enable NTP. The fixture nonce is HMAC-only — do not send it on live requests.
   </Step>
   <Step title="Match the message exactly">
-    No body: `{nonce}:{path}`. JSON body: `{nonce}:{path}:{JSON.stringify(body)}`. Path is the request path including `/v1/...`, not the full URL.
+    No body: `{nonce}:{path}`. JSON body: `{nonce}:{path}:` plus compact JSON (`JSON.stringify` in JavaScript; `json.dumps(..., separators=(",", ":"))` in Python). Path is the request path including `/v1/...`, not the full URL.
   </Step>
   <Step title="Hash then HMAC">
     SHA-256 (binary) → HMAC-SHA512 with the **secret** → Base64 → `api-signature`. Send `x-api-key` and `x-nonce` too.
