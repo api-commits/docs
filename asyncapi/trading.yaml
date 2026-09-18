@@ -1,4 +1,4 @@
-asyncapi: '2.6.0'
+asyncapi: '3.0.0'
 info:
   title: Bit2Me Pro Trading WebSocket
   version: '1.0.0'
@@ -12,125 +12,187 @@ info:
     url: https://support.bit2me.com
 servers:
   production:
-    url: wss://ws.bit2me.com/v1/trading
+    host: ws.bit2me.com
+    pathname: /v1/trading
     protocol: wss
     description: Pro Trading Spot WebSocket
 channels:
-  order-book:
+  orderBook:
+    address: order-book
     description: Level 2 order book. Subscribe with event subscribe and subscription.name order-book.
-    subscribe:
-      summary: Order book updates
-      message:
-        name: orderBook
-        payload:
-          type: object
-          properties:
-            event:
-              type: string
-              example: order-book
-            symbol:
-              type: string
-              example: B2M/EUR
-            data:
-              type: object
-              properties:
-                bids:
-                  type: array
-                asks:
-                  type: array
-                nonce:
-                  type: number
-  public-trades:
+    messages:
+      orderBook:
+        $ref: '#/components/messages/orderBook'
+  publicTrades:
+    address: public-trades
     description: Public last trades for a symbol.
-    subscribe:
-      summary: Public trades
-      message:
-        name: publicTrades
-        payload:
-          type: object
-          properties:
-            event:
-              type: string
-              example: public-trades
-            symbol:
-              type: string
-            data:
-              type: object
-              properties:
-                side:
-                  type: string
-                price:
-                  type: number
-                amount:
-                  type: number
-                timestamp:
-                  type: number
-  my-trades:
+    messages:
+      publicTrades:
+        $ref: '#/components/messages/publicTrades'
+  myTrades:
+    address: my-trades
     description: Your fills. Authentication required.
-    subscribe:
-      summary: Private trades
-      message:
-        name: myTrades
-        payload:
-          type: object
-          properties:
-            event:
-              type: string
-              example: my-trades
-            symbol:
-              type: string
-            data:
-              type: object
-  my-orders:
+    messages:
+      myTrades:
+        $ref: '#/components/messages/myTrades'
+  myOrders:
+    address: my-orders
     description: Your order updates. Authentication required.
-    subscribe:
-      summary: Private orders
-      message:
-        name: myOrders
-        payload:
-          type: object
-          properties:
-            event:
-              type: string
-              example: my-orders
-            data:
-              type: object
+    messages:
+      myOrders:
+        $ref: '#/components/messages/myOrders'
   executions:
+    address: executions
     description: Combined my-orders and my-trades stream. Authentication required.
-    subscribe:
-      summary: Executions
-      message:
-        name: executions
-        payload:
-          type: object
-  my-balance:
+    messages:
+      executions:
+        $ref: '#/components/messages/executions'
+  myBalance:
+    address: my-balance
     description: Balance changes. Authentication required.
-    subscribe:
-      summary: Private balances
-      message:
-        name: myBalance
-        payload:
-          type: object
-  my-working-capital:
+    messages:
+      myBalance:
+        $ref: '#/components/messages/myBalance'
+  myWorkingCapital:
+    address: my-working-capital
     description: Working capital limit changes. Authentication required.
-    subscribe:
-      summary: Working capital
-      message:
-        name: myWorkingCapital
-        payload:
-          type: object
+    messages:
+      myWorkingCapital:
+        $ref: '#/components/messages/myWorkingCapital'
   authenticate:
+    address: authenticate
     description: Send event authenticate with token from POST /v1/signin/apikey within 1 minute.
-    publish:
-      summary: Authenticate
-      message:
-        name: authenticate
-        payload:
-          type: object
-          required: [event, token]
-          properties:
-            event:
-              type: string
-              example: authenticate
-            token:
-              type: string
+    messages:
+      authenticate:
+        $ref: '#/components/messages/authenticate'
+operations:
+  receiveOrderBook:
+    action: receive
+    channel:
+      $ref: '#/channels/orderBook'
+  receivePublicTrades:
+    action: receive
+    channel:
+      $ref: '#/channels/publicTrades'
+  receiveMyTrades:
+    action: receive
+    channel:
+      $ref: '#/channels/myTrades'
+  receiveMyOrders:
+    action: receive
+    channel:
+      $ref: '#/channels/myOrders'
+  receiveExecutions:
+    action: receive
+    channel:
+      $ref: '#/channels/executions'
+  receiveMyBalance:
+    action: receive
+    channel:
+      $ref: '#/channels/myBalance'
+  receiveMyWorkingCapital:
+    action: receive
+    channel:
+      $ref: '#/channels/myWorkingCapital'
+  sendAuthenticate:
+    action: send
+    channel:
+      $ref: '#/channels/authenticate'
+components:
+  messages:
+    orderBook:
+      name: orderBook
+      payload:
+        type: object
+        properties:
+          event:
+            type: string
+            examples:
+              - order-book
+          symbol:
+            type: string
+            examples:
+              - B2M/EUR
+          data:
+            type: object
+            properties:
+              bids:
+                type: array
+                items: {}
+              asks:
+                type: array
+                items: {}
+              nonce:
+                type: number
+    publicTrades:
+      name: publicTrades
+      payload:
+        type: object
+        properties:
+          event:
+            type: string
+            examples:
+              - public-trades
+          symbol:
+            type: string
+          data:
+            type: object
+            properties:
+              side:
+                type: string
+              price:
+                type: number
+              amount:
+                type: number
+              timestamp:
+                type: number
+    myTrades:
+      name: myTrades
+      payload:
+        type: object
+        properties:
+          event:
+            type: string
+            examples:
+              - my-trades
+          symbol:
+            type: string
+          data:
+            type: object
+    myOrders:
+      name: myOrders
+      payload:
+        type: object
+        properties:
+          event:
+            type: string
+            examples:
+              - my-orders
+          data:
+            type: object
+    executions:
+      name: executions
+      payload:
+        type: object
+    myBalance:
+      name: myBalance
+      payload:
+        type: object
+    myWorkingCapital:
+      name: myWorkingCapital
+      payload:
+        type: object
+    authenticate:
+      name: authenticate
+      payload:
+        type: object
+        required:
+          - event
+          - token
+        properties:
+          event:
+            type: string
+            examples:
+              - authenticate
+          token:
+            type: string
