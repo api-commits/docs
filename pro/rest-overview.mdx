@@ -9,7 +9,7 @@ Snapshot: `openapi/trading-spot-rest.json` (17 operations). Server: `https://gat
 | --- | --- |
 | MarketData | Markets, candles, order book, tickers, last trades (no API key). Historical OHLCV: [Market data](/pro/market-data) (`limit` maximum **1000**) |
 | Trading | Add / get / cancel orders and trades |
-| Funding | Balance, working capital, deposit, withdraw, movements |
+| Funding | Wallet ↔ Pro: `POST /v1/trading/wallet/deposit` (`fromPocketId`, `amount`, `currency`) and `POST /v1/trading/wallet/withdraw` (`amount`, `currency`, optional `toPocketId`). Also balance, working capital, movements. Walkthrough: [First order](/pro/first-order) |
 | WsAuth | `POST /v1/signin/apikey` — token for Pro WS (**1 minute** TTL) |
 
 ## Playground

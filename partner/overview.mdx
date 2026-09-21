@@ -33,7 +33,7 @@ This page describes the published API. It is not legal advice. Bit2Me Legal and 
     POST /v2/blockchain-manager/travel-rule-order — not Embed report.
   </Card>
   <Card title="Transfers" href="/partner/transfers">
-    Social Pay vs pocket transfer — two rails.
+    Social Pay to a Bit2Me user (email, phone, alias). Last mile: Argentina only. Or pocket-to-pocket.
   </Card>
 </Columns>
 
@@ -42,8 +42,11 @@ This page describes the published API. It is not legal advice. Bit2Me Legal and 
 - One end user = one subaccount. Send `X-SUBACCOUNT-ID` after create.
 - Do not treat the user as live until KYC `status: verified` and `tier: 2` (persons).
 - Do not call identity init on `type: company`.
-- The first time a subaccount sends crypto to a new blockchain address, [verify that destination](/partner/withdrawals-address-book) with 2FA before you withdraw.
-- Travel Rule is [its own gateway call](/partner/travel-rule), only when address-book accept status is `pending-user-information`. Do not use Embed `report` for this.
+- The first time a subaccount sends crypto to a new blockchain address, [verify that destination](/partner/withdrawals-address-book) with 2FA before you withdraw. Later sends to the same `addressBookId` reuse it.
+- Complete [Travel Rule](/partner/travel-rule) on **every** on-chain withdrawal (`pending-user-information`). Do not use Embed `report` for this.
+- Pay another Bit2Me user with [Social Pay](/partner/transfers) (`email` / `phone` / `alias`). Local last mile is Argentina only.
+- Convert EUR/crypto on Pro: [First order](/pro/first-order) documents Wallet deposit and withdraw.
+- There is no sandbox API host. Use production gateway URLs and [Get API keys](https://account.bit2me.com/api-keys).
 - Apple Pay must leave the in-app WebView.
 
 <Info>

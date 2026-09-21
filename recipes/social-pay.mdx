@@ -3,8 +3,12 @@ title: "Social Pay is not a pocket transfer"
 description: "Escrow and claim vs destination.pocket."
 ---
 
-`operation: social-payment` creates a **Pay** order. Funds can wait in escrow until claim, auto-claim, or expiry refund. That is not an instant treasury post to a pocket.
+Use **Social Pay** (OpenAPI tag **Transfers**) to pay **another Bit2Me user**. Identify them with `email`, `phone`, or `alias`. That is the partner rail for in-network delivery, including Argentina last mile.
 
-For known pocket UUIDs, use `destination.pocket` instead. See [Social Pay vs pocket transfer](/partner/transfers).
+`operation: social-payment` (Wallet proforma) or `POST /v1/social-pay/order` creates a **Pay** order. Funds can wait in escrow until claim, auto-claim, or expiry refund. That is **not** an instant treasury post to a pocket UUID you already hold.
 
-Do not invent a silent master–sub product or an email-off switch.
+For two **known** pocket UUIDs on accounts you operate, use `destination.pocket` instead.
+
+On-chain to an **external** address is [address-book withdrawal](/partner/withdrawals-address-book), not Social Pay.
+
+See [Transfers](/partner/transfers). Do not invent a silent master–sub product or an email-off switch.

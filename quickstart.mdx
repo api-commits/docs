@@ -4,7 +4,7 @@ description: "Create keys, sign a request, and call the Bit2Me gateway."
 keywords: ["quickstart", "HMAC", "API keys"]
 ---
 
-Get an authenticated response from `https://gateway.bit2me.com` in a few minutes.
+Get an authenticated response from `https://gateway.bit2me.com` in a few minutes. Bit2Me does **not** provide a sandbox API host. The same production gateway is used with your keys.
 
 <Info>
 Before you start, check [status.bit2me.com](https://status.bit2me.com). If Auth or Wallet is degraded, wait before debugging your client. If this persists after the platform is healthy, [open a support ticket](https://support.bit2me.com/en/support/tickets/new).
@@ -12,7 +12,7 @@ Before you start, check [status.bit2me.com](https://status.bit2me.com). If Auth 
 
 <Steps>
   <Step title="Create an API key">
-    Open [Get API keys](https://account.bit2me.com/api-keys) and create a key. Copy the key and secret once. Rotate the key if it leaks.
+    Open [Get API keys](https://account.bit2me.com/api-keys) and create a key. Copy the **key and the secret** once. HMAC uses the secret. Rotate in that dashboard if a secret leaks ([Authentication](/guides/authentication#rotate-a-key)).
 
     Scopes (as documented on the gateway):
 
@@ -38,6 +38,8 @@ Before you start, check [status.bit2me.com](https://status.bit2me.com). If Auth 
   </Step>
   <Step title="Call a private endpoint">
     Example: list pockets on the parent account.
+
+    Compute `$BIT2ME_SIGNATURE` locally (nonce in milliseconds, message `{nonce}:/v1/wallet/pocket`, no JSON body). Do not POST `{}` to `signin/apikey` unless you also sign `{}`.
 
     <CodeGroup>
     ```bash cURL

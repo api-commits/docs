@@ -20,9 +20,13 @@ POST /v2/blockchain-manager/travel-rule-order/{orderId}
 
 `{orderId}` is the withdrawal id from the address-book **accept** response.
 
-Call this **only** when status is `pending-user-information` (the enum on `POST .../draft/accept`). Skip it for every other status. Do not use Travel Rule v1 (`POST /v1/blockchain-manager/travel-rule-order/{orderId}` is deprecated).
+Plan to **complete Travel Rule on every on-chain withdrawal**. Third-party destinations (typical remittance) are expected to return `pending-user-information`. Submit this POST when that status appears. Skip it **only** when the accept (or Wallet) status is a different value — calling it then returns **409**.
 
-If the API asks for this payload and you do not send it, the operation stays in that status and is cancelled within a few hours. EUR thresholds are **not published** here.
+Do not use Travel Rule v1 (`POST /v1/blockchain-manager/travel-rule-order/{orderId}` is deprecated).
+
+If the API asks for this payload and you do not send it, the operation stays in that status and is cancelled within a few hours (exact TTL is **not published**). A public EUR threshold is **not published** — follow the status, not a hardcoded amount.
+
+**Destination wallet verification is separate** and happens **the first time** you use an address (`addressBookId` confirm). Later withdrawals to the same verified entry reuse that id. See [Address book withdrawals](/partner/withdrawals-address-book).
 
 ## Payload fields from OpenAPI
 
@@ -37,7 +41,7 @@ Public FAQ (not a substitute for the API response): [Travel Rule frequently aske
 | [Address book](/partner/withdrawals-address-book) | After you accept the draft, **if** the **201** `status` is `pending-user-information` |
 | [Wallet legacy](/partner/withdrawals-wallet) | Only if a later Wallet or WebSocket payload asks for it. `GET /v1/wallet/transaction/{id}` does **not** document a `status` field in this snapshot |
 
-Travel Rule is separate from **destination wallet verification**. Verifying a new on-chain address happens first (address book confirm, or the legacy movement confirmation). See those pages.
+Travel Rule is **not** destination-wallet verification. Verify a new on-chain address **once** (address book confirm). Submit Travel Rule **on each** withdrawal that returns `pending-user-information`.
 
 <Info>
 Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com/en/support/tickets/new).

@@ -4,10 +4,12 @@ description: "HMAC-SHA512, nonce, subaccount header, and TOTP for the Bit2Me gat
 keywords: ["HMAC", "api-signature", "x-nonce", "x-totp"]
 ---
 
-Private endpoints on `https://gateway.bit2me.com` require an API key and an HMAC signature. Never share a key. If you suspect a leak, revoke it immediately.
+Private endpoints on `https://gateway.bit2me.com` require an API key **and** the matching **secret**. You create both in [Get API keys](https://account.bit2me.com/api-keys). The secret is shown once; it is what you HMAC with. Never share a key or secret.
+
+There is **no sandbox host**. Wallet, Pro, Partner, Embed, and gateway all use production URLs (`gateway.bit2me.com`, `embed.bit2me.com`). Integration testing uses your live keys with the smallest scope and an IP allowlist.
 
 <Warning>
-If requests fail with 401, sync the machine clock with NTP first. The documented nonce window is 5 seconds of clock skew. Check [status.bit2me.com](https://status.bit2me.com) before you assume a platform outage. If this persists, [open a support ticket](https://support.bit2me.com/en/support/tickets/new).
+If requests fail with 401, sync the machine clock with NTP first. The documented nonce window is 5 seconds of clock skew against Bit2Me UTC. Check [status.bit2me.com](https://status.bit2me.com) before you assume a platform outage. If this persists, [open a support ticket](https://support.bit2me.com/en/support/tickets/new).
 </Warning>
 
 ## Headers
@@ -37,7 +39,7 @@ The body used to sign **must** be the exact request body string:
 - JavaScript: `JSON.stringify(body)` (no spaces).
 - Python: `json.dumps(body, separators=(",", ":"))`.
 
-Do not mix pretty-printed JSON into the signature. Do not POST `{}` on no-payload calls: an empty object is still a body and would be signed as `{}`.
+Do not mix pretty-printed JSON into the signature. Do not POST `{}` on no-payload calls: an empty object is still a body and would be signed as `{}`. That includes `POST /v1/signin/apikey` when you are not sending `userId` — omit the body (and sign `{nonce}:{path}`), or send a real JSON object and sign that object.
 
 <CodeGroup>
 ```javascript Node.js
@@ -106,6 +108,32 @@ POST example (`JSON.stringify` / Python `separators=(",", ":")` — no spaces):
 | Message | `1687155308:/v1/trading/order:{"side":"buy","symbol":"BTC/EUR","price":"50000","amount":"0.01","orderType":"limit"}` |
 | `api-signature` | `TnwJpXmBNukFWneZrjQk+SCRk9Ck13B2oK7kSpnKEpdQajo9l9pn5sUnwIQcsguFmFBHDGwS2aOjXlMnKSIyXQ==` |
 
+## Which operations are signed
+
+OpenAPI marks private operations with `ApiKeyAuth`. That is the HMAC pair (`x-api-key` + `api-signature` + `x-nonce`), not “API key only”.
+
+| Signed | Not signed |
+| --- | --- |
+| Every private Wallet / Partner / Pro REST call, including `POST /v1/signin/apikey` | Public Pro market data (`GET /v1/trading/market-config`, candles, book, tickers) |
+| Widget session: `POST /v1/signin/apikey` with `{ "userId": "<subaccount>" }` | `POST /v1/signin/embed` — different contract (token exchange). Do not send your API key there |
+
+The REST playground cannot compute HMAC. Copy the example, sign locally, send from your backend. A working first call: [Quickstart](/quickstart) (`GET /v1/wallet/pocket`).
+
+## Invalid credentials (403)
+
+Some gateway routes, including HMAC sign-in and Pro Wallet funding, return **403** `invalid credentials` for a bad key **or** a bad signature. The body does not tell you which. Same response for an invented key.
+
+Before you open a ticket:
+
+1. Confirm you are on `https://gateway.bit2me.com` (no sandbox URL).
+2. You are calling `POST /v1/signin/apikey`, not `/v1/signin/embed`.
+3. You did **not** POST `{}` unless that object is also in the HMAC message.
+4. The secret matches the key (copy both from the dashboard; trim `.env` whitespace).
+5. Pass the [known-answer fixture](#known-answer-fixture). If the fixture fails, do not hit production.
+6. `x-nonce` is **milliseconds** (`Date.now()`), within 5 seconds of UTC.
+
+401 is still the usual HMAC / clock failure on most Wallet routes. See [Fix HMAC 401](/recipes/hmac-401) and [Errors](/guides/errors).
+
 ## Pair formats
 
 Do not mix these on the same call:
@@ -139,7 +167,16 @@ When you create a key you can request:
 - **Trade** — create or cancel orders
 - **Withdraw** — withdrawals that bypass two-factor authentication
 
-Prefer IP allowlists on Trade and Withdraw keys.
+Prefer IP allowlists on Trade and Withdraw keys. Do **not** issue a Withdraw-scoped key for subaccount remittance if you need TOTP on every send — that scope is documented as bypassing two-factor authentication.
+
+## Rotate a key
+
+1. Open [Get API keys](https://account.bit2me.com/api-keys).
+2. Create a **new** key (and secret). Store the secret outside the app logs.
+3. Point your backend at the new pair.
+4. **Revoke** the old key in the same dashboard.
+
+There is no published dual-key grace window. Treat revoke as immediate. If a secret leaked, revoke first, then rotate.
 
 ## Gateway WebSocket
 

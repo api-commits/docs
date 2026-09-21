@@ -26,10 +26,14 @@ sequenceDiagram
   U->>A: Pay fiat
   B->>G: Teller proforma
   G-->>B: WS teller-order-v1
-  B->>G: Wallet buy proforma + execute
-  B->>G: Verify destination (address book + 2FA)
-  B->>G: Crypto withdraw (address book or Wallet)
-  Note over B,G: Travel Rule POST /v2/.../travel-rule-order only if pending-user-information
+  B->>G: Wallet to Pro (POST /v1/trading/wallet/deposit) then spot order
+  B->>G: Pro to Wallet (POST /v1/trading/wallet/withdraw)
+  alt Pay another Bit2Me user
+    B->>G: Social Pay (Transfers) email phone or alias
+  else On-chain to external wallet
+    B->>G: Address book confirm first time then withdraw
+    B->>G: Travel Rule on every on-chain send
+  end
 ```
 
 ## Auth layers
@@ -44,10 +48,14 @@ sequenceDiagram
 ## Money path
 
 1. Fiat arrives on Bit2Me rails (bank, card, wallet pay).
-2. Crypto is bought into **subaccount pockets**.
-3. Delivery to the user is an **on-chain withdrawal** to an external address — not a second custodial wallet you invent.
+2. Convert on **Bit2Me Pro**: [Wallet → Pro → order → Pro → Wallet](/pro/first-order) (`POST /v1/trading/wallet/deposit` and `POST /v1/trading/wallet/withdraw`).
+3. Deliver either:
+   - **In-network:** [Social Pay](/partner/transfers) to another Bit2Me user (`email` / `phone` / `alias`). Local-currency last mile is **Argentina only**.
+   - **On-chain:** [address-book withdrawal](/partner/withdrawals-address-book) to an external address. Verify the destination **the first time**; complete [Travel Rule](/partner/travel-rule) on **every** send.
 
 Keep your own ledger of fiat allocated per subaccount. A minimum parent fiat balance can be part of initial setup. USD on Wallet is not documented as generally available.
+
+Partner trading fees and invoice cadence are **contractual**. This portal publishes on-chain fees on the withdrawal proforma/draft and Pro min/max on `GET /v1/trading/market-config`. Do not read a partner bps split from OpenAPI.
 
 <Warning>
 This page describes the published API. It is not legal advice. Bit2Me Legal and Compliance must review KYC, KYB, Travel Rule, and 2FA copy before this portal is announced to partners.

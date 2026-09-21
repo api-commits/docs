@@ -25,8 +25,10 @@ Use these generated Wallet REST pages. Sign HMAC on your backend. The playground
 | Create a currency pocket | `POST /v1/wallet/pocket` | [Create pocket](/api-reference/wallet/create-pocket) |
 | Bank-transfer deposit details | `GET /v1/teller/pocket/reference` | [Get pocket reference](/api-reference/funding/get-pocket-reference) |
 | Card / Apple Pay / Google Pay / PIX | `POST /v1/teller/order/proforma` | [Create deposit](/api-reference/funding/create-deposit) |
-| Verify a crypto destination | `POST /v1/blockchain-manager/address-book` | [Create an address book entry](/api-reference/funding/create-an-address-book-entry) |
-| Travel Rule (only if status asks) | `POST /v2/blockchain-manager/travel-rule-order/{orderId}` | [Travel Rule](/partner/travel-rule) |
+| Verify a crypto destination (first time) | `POST /v1/blockchain-manager/address-book` | [Create an address book entry](/api-reference/funding/create-an-address-book-entry) |
+| Travel Rule (every on-chain send when status asks) | `POST /v2/blockchain-manager/travel-rule-order/{orderId}` | [Travel Rule](/partner/travel-rule) |
+| Pay a Bit2Me user | `POST /v1/social-pay/order` (Transfers) | [Transfers](/partner/transfers) |
+| Wallet → Pro / Pro → Wallet | `POST /v1/trading/wallet/deposit` · `withdraw` | [First order](/pro/first-order) |
 
 HMAC session for widgets and Pro WS is `POST /v1/signin/apikey`, not `POST /v1/signin/embed`. See [Authentication](/guides/authentication).
 

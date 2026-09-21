@@ -1,24 +1,52 @@
 ---
 title: "Social Pay vs pocket transfer"
 description: "Two different rails. Do not treat Social Pay as silent institutional treasury."
+keywords:
+  - "Social Pay"
+  - "Transfers"
+  - "alias"
+  - "email"
 ---
+
+OpenAPI tag: **Transfers**. Use this page to pay **another Bit2Me user**. To send crypto to an **external** blockchain address, use [address-book withdrawals](/partner/withdrawals-address-book) instead (Travel Rule on every send; destination wallet verified the first time only).
 
 <Info>
 Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com/en/support/tickets/new).
 </Info>
 
-| Rail | How you call it | Behavior |
+## Choose the rail
+
+| Outcome | Rail | How you identify the destination |
 | --- | --- | --- |
-| **Social payment** | Proforma `operation: social-payment` plus `destination.email`, `phone`, or `alias` → execute | Creates a Pay order. Funds can sit in **escrow** until claim, auto-claim, or expiry refund. Retail email UX applies. |
-| **Pocket transfer** | Proforma with `destination.pocket` | Wallet movement between known pocket IDs. Does **not** go through the Pay escrow rail. |
+| Pay an existing Bit2Me user | **Social Pay** (Transfers tag) | `email`, `phone`, or `alias` |
+| Move between two pockets you already hold | **Pocket transfer** | `destination.pocket` (UUID) |
+| USDC (or other crypto) to an external wallet | [Address book](/partner/withdrawals-address-book) or [Wallet legacy](/partner/withdrawals-wallet) | Blockchain `address` + `network` |
 
-## Social Pay
+Local-currency last mile (off-ramp to fiat in the recipient’s country) is **only available in Argentina**, and only when the recipient is a Bit2Me user on this rail. Do not implement other country cash-outs from this API.
 
-Execute with `POST /v1/wallet/transaction`. A successful execute returns a Pay order (`orderId`, `status: pending`, `expiryDate`, `walletMovementId`) — not an instant pocket credit.
+There is **no** published “lookup user before you debit” endpoint. Identify the recipient with email, phone, or alias on create. Treat `412` / `403` on Transfers as “user not valid / forbidden” per OpenAPI — do not invent a resolve-by-`userId` call.
+
+There is **no** published invite for someone who does not have a Bit2Me account. Social Pay can sit in escrow until the payee **claims** (or auto-claim / expiry refund). That is not an onboarding API.
+
+## Social Pay (Bit2Me user)
+
+Create via Wallet proforma `operation: social-payment` plus `destination.email`, `phone`, or `alias`, then `POST /v1/wallet/transaction` — **or** `POST /v1/social-pay/order` (same Transfers family).
+
+`POST /v1/social-pay/order` body (`CreatePayOrderDto`):
+
+| Field | Required | Notes |
+| --- | --- | --- |
+| `pocketId` | Yes | Source pocket |
+| `type` | Yes | Pay order type (OpenAPI `PayOrderType`) |
+| `amount`, `currency` | Yes | Decimal strings |
+| `email` / `phone` / `alias` | One of | How you address the Bit2Me user |
+| `note` | No |  |
+
+A successful create is a Pay order (`orderId`, `status: pending`, `expiryDate`, `walletMovementId`) — **not** an instant credit to the payee’s pocket.
 
 List pending: `GET /v1/social-pay/order`.
 
-Claim with a chosen pocket:
+Claim (payee, chosen pocket):
 
 ```http
 POST /v1/social-pay/order/claim
@@ -28,14 +56,20 @@ Body is an array of objects with `orderId` and `pocketId`. Destination pocket **
 
 WebSocket types: `social.payment.pending`, `social.payment.success`, `social.payment.expiration`.
 
-## Pocket transfer
+## Pocket transfer (your pockets)
 
-When both pocket UUIDs are known, `destination.pocket` is the closer API treasury move. Confirm end-to-end for parent ↔ subaccount in your environment before you promise both directions.
+When **both** pocket UUIDs are known (parent treasury or two pockets on the same account), Wallet proforma with `destination.pocket` is a Wallet movement. It does **not** go through Pay escrow. Confirm parent ↔ subaccount in your environment before you promise both directions.
+
+## On-chain (not this tag)
+
+External USDC (or other assets) leaves Bit2Me on the withdrawal APIs:
+
+1. **Verify the destination wallet the first time** (address book + 2FA). Later sends to the same `addressBookId` skip a new confirm.
+2. **Complete Travel Rule on every on-chain withdrawal** when accept status is `pending-user-information` — expected for third-party destinations. See [Travel Rule](/partner/travel-rule).
 
 ## What not to invent
 
-- A unified “master-sub treasury product”
-- A documented API flag to disable claim emails
-- Auto-delivery guarantees for every company parent
-
-If you need silent institutional moves, prefer pocket transfer and confirm with your integration manager.
+- A lookup API that returns `userId` from email
+- Last-mile rails outside Argentina
+- A documented switch to disable claim emails
+- Treating Social Pay as `destination.pocket` (different rail — [recipe](/recipes/social-pay))

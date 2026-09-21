@@ -27,9 +27,8 @@ flowchart TD
   A[1. POST address-book] --> B[2. Confirm destination + 2FA]
   B --> C[3. Withdrawal draft]
   C --> D[4. Accept draft + 2FA]
-  D -->|pending-user-information| E[5. Travel Rule v2]
-  D -->|other status| F[Poll until processing / completed]
-  E --> F
+  D --> E[5. Travel Rule v2 on every send when pending-user-information]
+  E --> F[Poll until processing / completed]
 ```
 
 ## Prerequisites
@@ -69,13 +68,11 @@ flowchart TD
     ```
     For **stablecoin** withdrawals, missing TOTP returns **428**. Subaccounts use `gauth`.
   </Step>
-  <Step title="Travel Rule only if the status asks">
+  <Step title="Travel Rule on every withdrawal">
     ```http
     POST /v2/blockchain-manager/travel-rule-order/{orderId}
     ```
-    This is how you **submit Travel Rule** (originator and beneficiary data). It is not Embed `report`.
-
-    Required **only** when the accept **201** `status` is `pending-user-information`. Full field notes: [Travel Rule](/partner/travel-rule). Do not use Travel Rule v1. If requested and not sent, the operation stays in that status and is cancelled within a few hours. EUR threshold is not published here.
+    Complete Travel Rule on **every** on-chain send. Third-party destinations are expected to return accept **201** `status` `pending-user-information`. POST then; skip only if the status is different (**409** otherwise). This is not Embed `report`. Full field notes: [Travel Rule](/partner/travel-rule). Do not use Travel Rule v1. If requested and not sent, the operation is cancelled within a few hours. EUR threshold is not published.
   </Step>
 </Steps>
 
