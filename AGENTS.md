@@ -35,7 +35,9 @@ This is the **Bit2Me API** developer portal (Mintlify). It is a parallel site to
 ## Content boundaries
 
 - Do not invent endpoints, SLAs, uptime %, sunset dates, address-book TTLs, or Travel Rule EUR thresholds
-- Travel Rule only when status is `pending-user-information` (address-book accept enum). Do not document a second underscore form unless it appears in the snapshot.
+- Travel Rule: partners must complete it on **every** on-chain withdrawal when status is `pending-user-information` (expected for third-party destinations). Destination wallet confirmation is **first use** of that address only. Do not invent EUR thresholds or cancel TTLs.
+- There is **no sandbox**. Production hosts only (`gateway.bit2me.com`, `embed.bit2me.com`).
+- Social Pay (OpenAPI **Transfers**) is the rail to another Bit2Me user (`email` / `phone` / `alias`). Last-mile fiat is Argentina only. On-chain to an external wallet is address book, not Social Pay.
 - Do not document `internal` notification channel as stable
 - Futures WS is limited availability until product/legal sign-off
 - No partner names, user IDs, or Jira keys on customer pages

@@ -11,7 +11,7 @@ API keys: https://account.bit2me.com/api-keys
 MCP: https://mcp.bit2me.com
 OpenAPI snapshots in this repo: openapi/crypto.json, openapi/trading-spot-rest.json, openapi/embed.json
 
-Do not invent endpoints, SLAs, sunset dates, or Travel Rule thresholds. HMAC cannot be computed in the Mintlify playground. Nonce is Unix time in milliseconds.
+Do not invent endpoints, SLAs, sunset dates, or Travel Rule thresholds. HMAC cannot be computed in the Mintlify playground. Nonce is Unix time in milliseconds. There is no sandbox API host — use https://gateway.bit2me.com with production keys.
 
 ## Get started
 
@@ -57,7 +57,7 @@ Do not invent endpoints, SLAs, sunset dates, or Travel Rule thresholds. HMAC can
 - [Address book withdrawals](/partner/withdrawals-address-book)
 - [Wallet legacy withdrawals](/partner/withdrawals-wallet)
 - [Travel Rule](/partner/travel-rule)
-- [Social Pay vs pocket transfer](/partner/transfers)
+- [Transfers (Social Pay)](/partner/transfers)
 - [Partner REST overview](/partner/rest-overview)
 - [Embed widgets](/partner/widgets)
 - [Identity widget](/partner/embed-identity)
@@ -78,7 +78,7 @@ Do not invent endpoints, SLAs, sunset dates, or Travel Rule thresholds. HMAC can
 - [Missing subaccount header](/recipes/subaccount-header)
 - [Which withdrawal path?](/recipes/withdrawals)
 - [Apple Pay button missing](/recipes/apple-pay)
-- [Social Pay is not a pocket transfer](/recipes/social-pay)
+- [Social Pay vs pocket transfer](/recipes/social-pay)
 - [HTTP 429 and 418](/recipes/rate-limit)
 - [2FA 420 and 428](/recipes/totp)
 - [WebSocket vs polling](/recipes/websocket-vs-polling)

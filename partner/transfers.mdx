@@ -40,7 +40,7 @@ Create via Wallet proforma `operation: social-payment` plus `destination.email`,
 | `type` | Yes | Pay order type (OpenAPI `PayOrderType`) |
 | `amount`, `currency` | Yes | Decimal strings |
 | `email` / `phone` / `alias` | One of | How you address the Bit2Me user |
-| `note` | No |  |
+| `note` | No | |
 
 A successful create is a Pay order (`orderId`, `status: pending`, `expiryDate`, `walletMovementId`) — **not** an instant credit to the payee’s pocket.
 
