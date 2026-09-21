@@ -20,6 +20,9 @@ Check [status.bit2me.com](https://status.bit2me.com) before opening a ticket. If
   <Step title="Unit-test the fixture">
     Secret `example_secret_do_not_use_in_production`, nonce `1687155308`, GET `/v1/trading/wallet/balance` must produce `IgazRn9MPHcJjAfhrVHzI46U9iIDb7qbXYcTIN+9vrktJ6M4rET7WH+wasF+/8Thp9tzjkWaFCL8ASSzlY4D8g==`. Full table: [Authentication](/guides/authentication).
   </Step>
+  <Step title="403 on sign-in">
+    `POST /v1/signin/apikey` can return **403** `invalid credentials` for a bad key, a bad HMAC, or an empty JSON body `{}` that you did not sign. There is no sandbox host. Do not call `/v1/signin/embed` with an API key. Cookbook: [Authentication](/guides/authentication#invalid-credentials-403).
+  </Step>
   <Step title="Trim secrets">
     Extra spaces in `.env` fail 401. Rotate the key if it leaked. Do not paste secrets into tickets.
   </Step>

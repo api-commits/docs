@@ -30,7 +30,9 @@ Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout 
     POST /v1/trading/wallet/deposit
     ```
 
-    Required body: `fromPocketId`, `amount`, `currency` (strings). This operation documents **403** (invalid credentials) and **404** (wallet not found), not 412.
+    Required body: `fromPocketId`, `amount`, `currency` (strings). End-user funds: send `X-SUBACCOUNT-ID`. This operation documents **403** (invalid credentials) and **404** (wallet not found), not 412.
+
+    Reverse path: `POST /v1/trading/wallet/withdraw` (`amount`, `currency`, optional `toPocketId`) — next step after the fill.
   </Step>
   <Step title="Place the order">
     ```http
@@ -46,8 +48,19 @@ Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout 
 
     Sample: [trading-spot-samples REST trading](https://github.com/bit2me-devs/trading-spot-samples/tree/main/node/rest/trading).
   </Step>
-  <Step title="Confirm">
+  <Step title="Confirm the fill">
     `GET /v1/trading/order/{id}` or subscribe to `my-orders` on the [Pro WebSocket](/pro/websocket).
+  </Step>
+  <Step title="Return funds to Wallet">
+    After the fill, move Pro balances back to a Wallet pocket:
+
+    ```http
+    POST /v1/trading/wallet/withdraw
+    ```
+
+    Body: `amount`, `currency` (required); `toPocketId` when you target a pocket. Same 403 / 404 as deposit. This is **not** an on-chain withdrawal.
+
+    Wallet → Pro → order → Pro → Wallet is the documented conversion path. Details also sit on the Pro REST **Funding** tag ([Pro REST overview](/pro/rest-overview)).
   </Step>
 </Steps>
 

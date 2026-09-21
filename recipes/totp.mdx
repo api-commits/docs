@@ -14,14 +14,25 @@ Bit2Me Legal and Compliance must review 2FA copy before partner go-live. This pa
 | **420** | Invalid code |
 | **428** | 2FA required (including some stablecoin withdrawals) |
 
-**On withdrawals and other protected REST calls**, send headers `x-totp` (6 digits) and `x-totp-type`. For **subaccounts**, type is always `gauth` (not SMS or email).
+**On withdrawals and other protected REST calls**, send headers `x-totp` (6 digits) and `x-totp-type`. For **subaccounts**, type is always `gauth` (not SMS or email). A **Withdraw**-scoped API key is documented as bypassing two-factor authentication — do not use that scope if you need TOTP on every send.
 
-**Enroll** is a different contract (JSON body, not those headers):
+Partners who operate subaccounts **enroll Google Authenticator in the backend** and generate TOTP from the returned `secret`. Store that seed with the same controls as an API secret. End-user UX for showing a challenge is your product decision; the gateway only validates `x-totp`.
 
-1. `POST /v1/account/subaccount/sfa` with `{ "subaccountUserId": "<uuid>" }` — returns secret / QR.
-2. `PUT /v1/account/subaccount/sfa` with `{ "subaccountUserId": "<uuid>", "totp": "<code>" }`.
+**Enroll** uses a JSON body (not those headers):
 
-Parent enroll is `POST /v1/account/settings/sfa` then `PUT /v1/account/settings/sfa` with `totp` in the JSON body.
+### `POST /v1/account/subaccount/sfa`
+
+Required: `{ "subaccountUserId": "<uuid>" }`.
+
+**200** includes `secret` (required) and may include `algorithm` (example `SHA1`), `digits` (`6`), `period` (`30`), `qrCode` (data-URL PNG).
+
+### `PUT /v1/account/subaccount/sfa`
+
+Required: `{ "subaccountUserId": "<uuid>", "totp": "<6-digit code from that secret>" }`.
+
+**200** is a success payload (`SuccessResponse`).
+
+Parent enroll is `POST` then `PUT /v1/account/settings/sfa` with `totp` in the JSON body.
 
 Fresh codes only. Clock skew on the authenticator causes 420.
 
