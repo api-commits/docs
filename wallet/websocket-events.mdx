@@ -34,7 +34,7 @@ Deprecated aliases still appear in the spec. Prefer `teller-order-v1` and `walle
 | `identity.image.error` | image document or selfie | Verification image error. |
 | `identity.enhanced.measures.required` | langCode, email | Enhanced measures required. |
 | `email.confirm.done` | `email` | Email confirmed. |
-| `wallet-transaction-v1` | userId, pocketId, amount, currency, transactionId, status, tellerId | Wallet transaction. Prefer this over deprecated `teller.deposit.card.success`. |
+| `wallet-transaction-v1` | userId, pocketId, amount, currency, transactionId, status, tellerId | Wallet transaction. Prefer this over deprecated `teller.deposit.card.success`. `transactionId` is **not** the blockchain-manager `orderId` from an [address-book draft](/partner/withdrawals-address-book). Do not treat that `orderId` as `tellerId`. |
 | `wallet.trx.received` | pocket, amount, transactionId | On-chain receive. |
 | `wallet.trx.confirmed` | pocket, amount, transactionId | On-chain send confirmed. |
 | `wallet.trx.reimbursement` | pocket, bankAccount, tellerOrderId | Refunded. |

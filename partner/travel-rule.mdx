@@ -1,7 +1,10 @@
 ---
 title: "Travel Rule"
-description: "Submit originator and beneficiary data with POST /v2/blockchain-manager/travel-rule-order when the withdrawal asks for it."
-keywords: ["Travel Rule", "pending-user-information", "travel-rule-order"]
+description: "Wallet legacy only: confirm the proforma, then POST /v2/blockchain-manager/travel-rule-order with the operation id."
+keywords:
+  - "Travel Rule"
+  - "pending-user-information"
+  - "travel-rule-order"
 ---
 
 {/* COMPLIANCE_BLOCKER */}
@@ -18,15 +21,19 @@ You **report Travel Rule data** to Bit2Me on the gateway. You do **not** use Emb
 POST /v2/blockchain-manager/travel-rule-order/{orderId}
 ```
 
-`{orderId}` is the withdrawal id from the address-book **accept** response.
+`{orderId}` is the **operation id** returned when you confirm a Wallet proforma. It is **not** the proforma id, and it is **not** the blockchain-manager `orderId` from [address book](/partner/withdrawals-address-book).
 
-Plan to **complete Travel Rule on every on-chain withdrawal**. Third-party destinations (typical remittance) are expected to return `pending-user-information`. Submit this POST when that status appears. Skip it **only** when the accept (or Wallet) status is a different value — calling it then returns **409**.
+This call is the **Wallet legacy** path only:
+
+1. `POST /v1/wallet/transaction/proforma`
+2. Confirm that proforma id with `POST /v1/wallet/transaction`
+3. `POST /v2/blockchain-manager/travel-rule-order/{orderId}` with the operation id from step 2, **only** when the operation status is `pending_user_information`
+
+Do **not** call this endpoint after an address-book draft. On that path, `walletType`, `walletOwnership`, and `exchangeName` are already on the entry. See [Address book withdrawals](/partner/withdrawals-address-book).
 
 Do not use Travel Rule v1 (`POST /v1/blockchain-manager/travel-rule-order/{orderId}` is deprecated).
 
-If the API asks for this payload and you do not send it, the operation stays in that status and is cancelled within a few hours (exact TTL is **not published**). A public EUR threshold is **not published** — follow the status, not a hardcoded amount.
-
-**Destination wallet verification is separate** and happens **the first time** you use an address (`addressBookId` confirm). Later withdrawals to the same verified entry reuse that id. See [Address book withdrawals](/partner/withdrawals-address-book).
+If the Wallet path asks for this payload and you do not send it, the operation stays in `pending_user_information` and is cancelled within a few hours (exact TTL is **not published**). A public EUR threshold is **not published** — follow the status, not a hardcoded amount.
 
 ## Payload fields from OpenAPI
 
@@ -38,10 +45,10 @@ Public FAQ (not a substitute for the API response): [Travel Rule frequently aske
 
 | Path | When you submit Travel Rule |
 | --- | --- |
-| [Address book](/partner/withdrawals-address-book) | After you accept the draft, **if** the **201** `status` is `pending-user-information` |
-| [Wallet legacy](/partner/withdrawals-wallet) | Only if a later Wallet or WebSocket payload asks for it. `GET /v1/wallet/transaction/{id}` does **not** document a `status` field in this snapshot |
+| [Address book](/partner/withdrawals-address-book) | Do **not** call this endpoint. The fields are already on the address-book entry. |
+| [Wallet legacy](/partner/withdrawals-wallet) | After you confirm the proforma, **if** the operation status is `pending_user_information`. `{orderId}` is the operation id from that confirm. |
 
-Travel Rule is **not** destination-wallet verification. Verify a new on-chain address **once** (address book confirm). Submit Travel Rule **on each** withdrawal that returns `pending-user-information`.
+Travel Rule is **not** destination-wallet verification. Verify a new on-chain address **once** (address book confirm). On Wallet legacy, submit Travel Rule only when that operation returns `pending_user_information`.
 
 <Info>
 Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com/en/support/tickets/new).
