@@ -1,6 +1,6 @@
 ---
 title: "Crypto withdrawals (Wallet legacy)"
-description: "Proforma plus execute on /v1/wallet/transaction — still live in OpenAPI."
+description: "Proforma, confirm that id, then Travel Rule with the operation id. Still live."
 ---
 
 {/* COMPLIANCE_BLOCKER */}
@@ -11,18 +11,18 @@ This page describes the published API. It is not legal advice. Bit2Me Legal and 
 
 `POST /v1/wallet/transaction/proforma` and `POST /v1/wallet/transaction` are **not** marked deprecated. Prefer [address book](/partner/withdrawals-address-book) for new subaccount work. Sunset dates are not published.
 
-Two optional branches after execute. Prefer [address book](/partner/withdrawals-address-book) for **new** destinations: that path verifies the wallet **before** you withdraw and is the snapshot that returns `pending-user-information`.
+This path is **not** the address-book draft. Do not decide Travel Rule from an address-book accept status. [Address book](/partner/withdrawals-address-book) does not call `travel-rule-order`.
 
 | Branch | What it is | Required when | Skip when |
 | --- | --- | --- | --- |
-| Travel Rule | Submit originator/beneficiary data (`POST /v2/blockchain-manager/travel-rule-order/{id}`). Not Embed `report`. | Address-book accept **201** `status` is `pending-user-information` | Any other status |
+| Travel Rule | `POST /v2/blockchain-manager/travel-rule-order/{orderId}` with the **operation id** from execute. Not Embed `report`. | Operation status is `pending_user_information` | Any other status |
 | Destination verification | Confirm the on-chain destination for this movement (deprecated pair) | `isVerified: false` | Already verified, or GET stays 404 |
 
 ```mermaid
 flowchart TD
-  A[1. Proforma] --> B[2. Execute + 2FA]
-  B --> C[3. Prefer address-book accept status]
-  C -->|pending-user-information| D[4. Travel Rule v2]
+  A[1. Proforma] --> B[2. Confirm proforma id + 2FA]
+  B --> C[3. Read operation status]
+  C -->|pending_user_information| D[4. Travel Rule v2 with operation id]
   C -->|other| E[5. GET address confirmation if needed]
   D --> E
   E -->|isVerified false| F[6. Confirm + 2FA]
@@ -35,22 +35,26 @@ flowchart TD
     ```http
     POST /v1/wallet/transaction/proforma
     ```
-    `type: SEA` = send exact amount (pocket debited **amount + network fee**). If omitted, `REA` (receive exact amount). Network list REST paths are **not** in this snapshot — use the `network` field the address-book or currency catalog already returns. No 2FA on the quote.
+    `type: SEA` = send exact amount (pocket debited **amount + network fee**). If omitted, `REA` (receive exact amount). The [address-book draft](/partner/withdrawals-address-book) does **not** take `type`. Network list REST paths are **not** in this snapshot — use the `network` field the address-book or currency catalog already returns. No 2FA on the quote.
   </Step>
   <Step title="Execute">
     ```http
     POST /v1/wallet/transaction
     ```
-    Body field `proforma` is the quote id. Headers `x-totp` and `x-totp-type: gauth`. Snapshot **200** is `{ "result": true }` — it does **not** return a transaction `id`.
+    Body field `proforma` is the quote id from step 1. Headers `x-totp` and `x-totp-type: gauth`. The **200** returns the **operation id**. That id is not the proforma id. Use it for Travel Rule and for `GET /v1/wallet/transaction/{id}`.
   </Step>
   <Step title="Inspect the movement">
     ```http
     GET /v1/wallet/transaction/{id}
     ```
-    Use an id from list endpoints (`GET /v2/wallet/transaction` or `GET /v3/wallet/transaction`) or from WebSocket `wallet-transaction-v1`. This GET schema does **not** document `status`. Do not look for `pending_user_information` here.
+    `{id}` is the operation id from execute. Read `status`. `pending_user_information` means you must submit Travel Rule. Do not use a blockchain-manager order id from the address-book path on this GET.
   </Step>
-  <Step title="Travel Rule (only if the API asks)">
-    For **new** subaccount crypto out, use [address book](/partner/withdrawals-address-book): accept-draft **201** includes `status`. Call [Travel Rule](/partner/travel-rule) only when that value is `pending-user-information`. `{orderId}` is the withdrawal id from accept, not from Wallet execute.
+  <Step title="Travel Rule (only if status asks)">
+    ```http
+    POST /v2/blockchain-manager/travel-rule-order/{orderId}
+    ```
+
+    `{orderId}` is the operation id from execute, **not** the proforma id. Call it only when `GET /v1/wallet/transaction/{id}` returned `pending_user_information`. Do not use Travel Rule v1. This step is **not** part of [address book](/partner/withdrawals-address-book).
   </Step>
   <Step title="Destination wallet verification (first use on this path)">
     OpenAPI marks this pair **deprecated** in favour of address-book confirm.

@@ -1,6 +1,6 @@
 ---
 title: "KYC (end user)"
-description: "Eight steps to verify a natural-person subaccount."
+description: "Verify a natural-person subaccount, including session cap, enhanced measures, and 409 phone versus email."
 ---
 
 {/* COMPLIANCE_BLOCKER */}
@@ -76,14 +76,82 @@ flowchart LR
   </Step>
 </Steps>
 
+## Operating rules
+
+These rules apply to any partner subaccount. They are not a single-customer exception.
+
+### Document rejection is not a session expiry
+
+Closure dates are document rejections or manual closures, not Didit session expirations. A stored image means the front side was received. Didit may return `unknown`; an operator can reclassify it (`imageDoc` = unusable document image). The same image can be closed with no new capture.
+
+| Code | Meaning |
+| --- | --- |
+| `docMissingImage` | A required image is missing (back side or selfie). The front may already be on file. |
+| `noDocUploaded` | Manual closure. No image was uploaded. |
+| `imageDoc` | The document image is unusable. |
+
+Didit labels these `Expired` and `Abandoned`. Bit2Me does not convert them into those errors. `error` and `errorReviewed` do not block a restart. The user can open a full capture (front, back, and selfie) once they are under the session cap. Operations can reset the attempt counter.
+
+### Session cap
+
+The cap is **3 sessions in 15 days** (`maxRetriesReached`). The counter includes every verification session created in that window, including sessions where nothing was captured. It is not the number of sessions the user thinks they started. A QR opened in Android's in-app browser can create and abandon a session before the camera and still increment the counter. See [Identity widget](/partner/embed-identity).
+
+Those events store no device, browser, user agent, or camera error. The closure email is `identity.rejected` (English subject: _Document pending verification_). The payload has no reason and no new link. The HTML body is not reproduced here.
+
+### Enhanced measures
+
+Identity can already be captured (email, phone, questionnaire, document image) while the only error is `enhancedMeasuresNotReceived` and status is `waitingUser`. The user does not redo identity verification.
+
+| Score | Band | What happens |
+| --- | --- | --- |
+| 8–9 | High | Documentation is requested at verification. There is no deposit threshold. |
+| 9 | Cap | The engine raises risk to 9 when the nationality score is 5 or 7, or the residence score is 4. |
+| 6 | Medium-high | Measures apply only from €10,000 cumulative. This does not block before a deposit. |
+
+Whether a nationality and residence pair should score 6 or 9 is a Compliance confirmation. The API does not decide it.
+
+The system does not ask for a named file list. It opens AML measure **MR1** and a generic `reinforcedMeasures` document in a requested state. Compliance defines the package. There is no partner endpoint to upload it. The channel is the Zoho Sign form in the email `identity.enhanced.measures.required` (English subject: _Documentation pending_) until the API supports upload.
+
+On a subaccount that email goes to the **partner's internal address**, not the end client. The partner must forward it.
+
+| Language | Form |
+| --- | --- |
+| EN | [Zoho Sign (EN)](https://sign.zoho.com/signform?form_link=234b4d535f495623fe64f983dacfe91979ffde926af98538b1865a03a2e122b1a43d36dd60c5f3bbb7b9297c7df992fdcdce07215d3cb346c546a0d7a7aa11d83776e042e8774e99#) |
+| ES | [Zoho Sign (ES)](https://sign.zoho.com/signform?form_link=234b4d535f4956232755c614571227cc2c81e2048bf1fa74dbbf18c710eae21da1924d3834b221571f40f26885a58665857d585d779209b2259864a910ae7173a19e15cf7046c36a#) |
+
+### HTTP 409 on subaccount creation
+
+**409** is two errors. Read `errorCode` in the response body. A partner link id or party id is not in account or auth logs, so the body is required.
+
+| `errorCode` | Message | Rule |
+| --- | --- | --- |
+| `B2M_AUTH_PHONE_DUPLICATED` | The phone already exists | Checked against any individual Bit2Me user, including direct accounts. A registered phone blocks creation. Phone numbers cannot be reused. |
+| `B2M_AUTH_EMAIL_DUPLICATED` | Duplicated email | Stored as `{mainUserId}###{email}`. Does not conflict with a direct Bit2Me account. Conflicts with another subaccount of the **same** partner. |
+
+"Same email or phone as a Bit2Me account" is true only for the phone.
+
+### Document type when nationality and residence differ (outside the EEA)
+
+`unsupportedIdTypeResidenceCountry` is a document-type block, not a risk-score block. If nationality is not the residence country and residence is **outside the EEA**, only a document **issued by the residence country** is accepted:
+
+| Code | Document |
+| --- | --- |
+| `idcard` | National ID card of the residence country |
+| `foreign-id-card` | Resident card or residence permit issued by that country |
+
+A national ID card or passport of the nationality country is not accepted. Attempts can be reset so the user starts again with a residence-country document. This note does not state the rule inside the EEA, or when nationality and residence are the same country.
+
 ## Common mistakes
 
 1. Creating the subaccount before the user accepts terms in your app.
 2. Sending name / surname / birthDate on the AML `PUT`.
-3. Embedding identity in a WebView without camera or microphone.
+3. Embedding identity in a WebView without camera or microphone, or opening the QR in an in-app browser so abandoned sessions count toward the cap.
 4. Uploading partner-captured ID or liveness.
 5. Omitting `nationalityCountryCode` on the address.
 6. Treating the user as live before `verified` (and `tier: 2` when returned).
+7. Reading a document-rejection date as a Didit session expiry.
+8. Telling the partner that a **409** means "same email or phone as a Bit2Me account" without the `errorCode`.
+9. Asking the end user to redo identity when the only error is `enhancedMeasuresNotReceived`.
 
 <Info>
 Check [status.bit2me.com](https://status.bit2me.com) before you debug a timeout or 5xx. If the platform is healthy and the error persists, [open a support ticket](https://support.bit2me.com/en/support/tickets/new).
