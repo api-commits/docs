@@ -11,7 +11,7 @@ API keys: https://account.bit2me.com/api-keys
 MCP: https://mcp.bit2me.com
 OpenAPI snapshots in this repo: openapi/crypto.json, openapi/trading-spot-rest.json, openapi/embed.json
 
-Do not invent endpoints, SLAs, sunset dates, or Travel Rule thresholds. HMAC cannot be computed in the Mintlify playground. Nonce is Unix time in milliseconds.
+Do not invent endpoints, SLAs, sunset dates, or Travel Rule thresholds. HMAC cannot be computed in the Mintlify playground. Nonce is Unix time in milliseconds. There is no sandbox API host — use https://gateway.bit2me.com with production keys.
 
 ## Get started
 

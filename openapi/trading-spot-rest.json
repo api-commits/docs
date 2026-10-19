@@ -7,7 +7,7 @@
   "servers": [
     {
       "url": "https://gateway.bit2me.com",
-      "description": "Production"
+      "description": "Production. Bit2Me does not provide a sandbox API host."
     }
   ],
   "tags": [
