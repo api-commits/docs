@@ -169,6 +169,12 @@ When you create a key you can request:
 
 Prefer IP allowlists on Trade and Withdraw keys. Do **not** issue a Withdraw-scoped key for subaccount remittance if you need TOTP on every send — that scope is documented as bypassing two-factor authentication.
 
+## Partner portal
+
+Create one API key per teammate in [Get API keys](https://account.bit2me.com/api-keys). They sign in at [https://partners.bit2me.com/login](https://partners.bit2me.com/login). The portal session uses the permissions on that key (Read, Trade, Withdraw).
+
+Copy the secret when you create the key. HMAC calls still need that secret on your backend. The portal login is a separate step from signing gateway requests.
+
 ## Rotate a key
 
 1. Open [Get API keys](https://account.bit2me.com/api-keys).

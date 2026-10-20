@@ -6,7 +6,7 @@ description: "Address book has no Travel Rule call. Wallet legacy uses the opera
 | Path | Use |
 | --- | --- |
 | [Address book](/partner/withdrawals-address-book) | Current OpenAPI target: **verify the destination wallet** (create + 2FA confirm) → draft → accept |
-| [Wallet legacy](/partner/withdrawals-wallet) | Still live: proforma + execute with `destination.address`. First-use destination confirm is deprecated here |
+| [Wallet legacy](/partner/withdrawals-wallet) | Still live: proforma + execute with `destination.address`. Set `destination.network` to the `networkId` from `GET /v1/blockchain-manager/configuration/currency`. First-use destination confirm is deprecated here |
 
 [Travel Rule](/partner/travel-rule) is `POST /v2/blockchain-manager/travel-rule-order/{id}` on **every** on-chain withdrawal that returns `pending-user-information` (expected for third-party destinations). Destination wallet confirm is **first use** of that address only. It is not Embed `POST /v1/b2m/transaction/report`.
 

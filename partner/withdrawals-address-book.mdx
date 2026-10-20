@@ -44,6 +44,8 @@ flowchart TD
 
     Always send `address`, `currency`, `network`, `walletType` (`unhosted` or `exchange`), `walletOwnership` (`own` or `other`). Add `exchangeName` when the type is `exchange`. Optional `tag` for memo/destination tag.
 
+    `network` is the same `networkId` you send as `destination.network` on the [Wallet proforma](/partner/withdrawals-wallet). Read it from `GET /v1/blockchain-manager/configuration/currency`.
+
     **201** includes `addressId` and `status`: `validating` | `verified` | `expired`. **409** means an active entry already exists.
 
     How long `validating` lasts before `expired` is **not published**.

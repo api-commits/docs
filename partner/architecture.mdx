@@ -41,6 +41,7 @@ sequenceDiagram
 | Layer | Mechanism | Used for |
 | --- | --- | --- |
 | Parent HMAC | `x-api-key`, `api-signature`, `x-nonce` | Create subaccount, server-side treasury |
+| Partner portal | [partners.bit2me.com/login](https://partners.bit2me.com/login) | Each teammate signs in with their own API key. Access follows that key's permissions |
 | Subaccount header | `X-SUBACCOUNT-ID: {userId}` | User-scoped REST |
 | Subaccount session | `POST /v1/signin/apikey` with `userId` | Embed widgets, some identity init contracts |
 | 2FA | `x-totp` + `x-totp-type: gauth` | Withdrawals and other protected ops |
